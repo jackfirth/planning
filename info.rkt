@@ -9,7 +9,8 @@
               "planning")))
 
 (define deps
-  (list "base"))
+  (list "rebellion"
+        "base"))
 
 (define build-deps
   (list "racket-doc"
