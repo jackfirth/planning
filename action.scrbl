@@ -67,3 +67,60 @@ obstructors together define an action's @deftech{preconditions}. Meanwhile, the
    values in common because an absent @tech{fluent} cannot be deleted.}]
 
  If any of the above conditions are violated, a contract exception is raised.}
+
+@defproc[(action-applicable? [act action?] [state set?]) boolean?]{
+ Determines whether @racket[act] is @tech{applicable} in @racket[state]. To be
+ applicable, @racket[state] must contain every value in @racket[
+ (action-requirements act)] and none of the values in @racket[
+ (action-obstructors act)].}
+
+@defproc[(action-execute [act action?] [state set?]) set?]{
+ Executes @racket[act] in @racket[state], returning an updated state. The given
+ @racket[act] must be @tech{applicable} in @racket[state], or else a contract
+ error is raised. The updated state contains all of the same @tech{fluents} as
+ @racket[state], minus the @tech{deletions} of @racket[act] and plus the @tech{
+  additions} of @racket[act].}
+
+@defproc[(action-requirements [act action?]) set?]{
+ Returns the @tech{requirements} of @racket[act], which is the set of @tech{
+  fluents} that must be present in the state in order for the action to be
+ @tech{applicable}.}
+
+@defproc[(action-obstructors [act action?]) set?]{
+ Returns the @tech{obstructors} of @racket[act], which is the set of @tech{
+  fluents} that cannot be present in the state in order for the action to be
+ @tech{applicable}.}
+
+@defproc[(action-additions [act action?]) set?]{
+ Returns the @tech{additions} of @racket[act], which is the set of @tech{
+  fluents} that are added to the state when the action is applied.}
+
+@defproc[(action-deletions [act action?]) set?]{
+ Returns the @tech{deletions} of @racket[act], which is the set of @tech{
+  fluents} that are removed from the state when the action is applied.}
+
+@defproc[(action-preconditions [act action?])
+         (hash/c any/c precondition-fluent-type?)]{
+ Returns the @tech{preconditions} of @racket[act], which is the action's @tech{
+  requirements} and @tech{obstructors}. The returned hash maps @tech{fluents} to
+ which type of precondition the fluent is.}
+
+@deftogether[[
+ @defproc[(precondition-fluent-type? [v any/c]) boolean?]
+ @defthing[required-fluent precondition-fluent-type?]
+ @defthing[obstructing-fluent precondition-fluent-type?]]]{
+ An @rebellion-tech{enum type} for the two types of @tech{fluents} an action can
+ have in its @tech{preconditions}.}
+
+@defproc[(action-effects [act action?])
+         (hash/c any/c effect-fluent-type?)]{
+ Returns the @tech{effects} of @racket[act], which is the action's @tech{
+  additions} and @tech{deletions}. The returned hash maps @tech{fluents} to
+ which type of effect the fluent is.}
+
+@deftogether[[
+ @defproc[(effect-fluent-type? [v any/c]) boolean?]
+ @defthing[added-fluent effect-fluent-type?]
+ @defthing[deleted-fluent effect-fluent-type?]]]{
+ An @rebellion-tech{enum type} for the two types of @tech{fluents} an action can
+ have in its @tech{effects}.}

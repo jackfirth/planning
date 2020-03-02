@@ -10,7 +10,8 @@
 (module+ doc
   (provide
    (contract-out
-    [racket-reference-tech (-> pre-content? ... element?)])))
+    [racket-reference-tech (-> pre-content? ... element?)]
+    [rebellion-tech (-> pre-content? ... element?)])))
 
 (require racket/set)
 
@@ -29,4 +30,7 @@
 
 (module+ doc
   (define (racket-reference-tech . text)
-    (apply tech #:doc '(lib "scribblings/reference/reference.scrbl") text)))
+    (apply tech #:doc '(lib "scribblings/reference/reference.scrbl") text))
+
+  (define (rebellion-tech . text)
+    (apply tech #:doc '(lib "rebellion/main.scrbl") text)))
