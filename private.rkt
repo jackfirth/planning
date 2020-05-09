@@ -5,6 +5,7 @@
 (provide
  (contract-out
   [default (-> any/c any/c any/c)]
+  [sequence->set (-> (sequence/c any/c) set?)]
   [set-contains? (-> set? any/c boolean?)]
   [set-contains-all? (-> set? set? boolean?)]
   [set-contains-any? (-> set? set? boolean?)]
@@ -39,6 +40,8 @@
 
 (define (default arg default-value)
   (if (unsupplied-arg? arg) default-value arg))
+
+(define (sequence->set seq) (for/set ([v seq]) v))
 
 (define (set-contains? s item) (set-member? s item))
 (define (set-contains-all? s items) (subset? items s))

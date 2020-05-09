@@ -8,22 +8,23 @@
    (->i ()
         (#:additions [additions multiset?]
          #:deletions [deletions multiset?]
-         #:replacements [replacements (hash/c any/c exact-nonnegative-integer?)]
-         #:requirements [requirements (hash/c any/c range?)])
+         #:replacements [replacements (hash/c any/c natural? #:immutable #t)]
+         #:requirements [requirements (hash/c any/c range? #:immutable #t)])
         [_ multiset-action?])]
   [multiset-action? predicate/c]
   [multiset-action-additions (-> multiset-action? multiset?)]
   [multiset-action-deletions (-> multiset-action? multiset?)]
   [multiset-action-replacements
-   (-> multiset-action? (hash/c any/c exact-nonnegative-integer?))]
+   (-> multiset-action? (hash/c any/c natural? #:immutable #t))]
   [multiset-action-requirements
-   (-> multiset-action? (hash/c any/c range?))]
+   (-> multiset-action? (hash/c any/c range? #:immutable #t))]
   [multiset-action-applicable? (-> multiset-action? multiset? boolean?)]
   [multiset-action-perform (-> multiset-action? multiset? multiset?)]))
 
 (require fancy-app
          planning/private
          point-free
+         racket/math
          rebellion/base/range
          rebellion/collection/hash
          rebellion/collection/multiset

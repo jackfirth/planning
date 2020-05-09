@@ -38,8 +38,9 @@
   [set-action-additions (-> set-action? set?)]
   [set-action-deletions (-> set-action? set?)]
   [set-action-preconditions
-   (-> set-action? (hash/c any/c set-precondition-fluent-type?))]
-  [set-action-effects (-> set-action? (hash/c any/c set-effect-fluent-type?))]
+   (-> set-action? (hash/c any/c set-precondition-fluent-type? #:immutable #t))]
+  [set-action-effects
+   (-> set-action? (hash/c any/c set-effect-fluent-type? #:immutable #t))]
   [set-action-applicable? (-> set-action? set? boolean?)]
   [set-action-perform
    (->i ([action set-action?] [state-fluents set?])
