@@ -21,7 +21,7 @@ to Racketeers.
 
 All @tech{automated planning} focuses on at least one of the following objects:
 
-@itemlist{
+@itemlist[
  @item{A @deftech{state}, which is a representation of the state of the world.}
 
  @item{An @deftech{action}, which is a transformation of a state. Not every
@@ -32,7 +32,7 @@ All @tech{automated planning} focuses on at least one of the following objects:
   involves minimizing costs.}
 
  @item{A @deftech{goal}, which is a statement about what kinds of states the
-  planning agent should try to achieve.}}
+  planning agent should try to achieve.}]
 
 A @deftech{planning problem} is a combination of an initial state, a collection
 of actions, and a goal. An @deftech{automated planner} is a computer algorithm
