@@ -25,7 +25,9 @@ users.
 
 @table-of-contents[]
 
-@section{Basic Terminology}
+@section{Overview}
+
+@subsection{Basic Terminology}
 
 All @tech{automated planning} focuses on at least one of the following objects:
 
@@ -48,7 +50,7 @@ that solves planning problems by producing a @deftech{plan} --- a list of
 actions to perform that will change the initial state into a state that achieves
 the goal.
 
-@section{State Representations}
+@subsection{State Representations}
 
 To plan, one must consider the effects of one's actions on the state of the
 world. Therefore, an automated planner is limited by its model of the world
@@ -85,3 +87,49 @@ representations to be easier to work with than variable-oriented
 representations, but only partly. Mostly it's because it's more complicated and
 I never had much personal interest in it. If you wish to use a state variable
 representation, please reach out to me so I can learn more about your use case.
+
+@section{The Multiset State Representation}
+
+In the @tech{multiset state representation}, the world is represented by a
+@rebellion-tech{multiset}. Actions and goals are represented by
+@tech{multiset actions} and @tech{multiset goals}.
+
+@subsection{Multiset Actions}
+@defmodule[planning/multiset/action]
+
+A @deftech{multiset action} is an @tech{action} on @rebellion-tech{multisets}.
+Multiset actions have four components:
+
+@itemlist[
+ @item{A hash of preconditions, where each key is an element and the
+  corresponding value is a @rebellion-tech{range} of natural numbers describing
+  how many copies of the element must be in the multiset for the action to be
+  @tech{applicable}.}
+
+ @item{A collection of elements to remove from the multiset. Attempting to
+  remove elements that a multiset does not contain is allowed, but it has no
+  effect.}
+
+ @item{A collection of elements to add to the multiset.}
+
+ @item{A hash of replacements, where each key is an element and the
+  corresponding value is a natural number that determines how many copies of the
+  element the multiset will contain after the action is performed.}]
+
+@defproc[(multiset-action
+          [#:preconditions preconditions (hash/c any/c range?) empty-hash]
+          [#:deletions deletions multiset? empty-multiset]
+          [#:additions additions multiset? empty-multiset]
+          [#:replacements replacements (hash/c any/c nonnegative-integer?)
+           empty-hash])
+         multiset-action?]{
+ Constructs a @tech{multiset action}.}
+
+@subsection{Multiset Goals}
+
+A @deftech{multiset goal} is a @tech{goal} in the
+@tech{multiset state representation}. Multiset goals contain only a hash of
+preconditions of the same form as the preconditions in a @tech{multiset action}.
+
+@defproc[(multiset-goal [preconditions (hash/c any/c range?)]) multiset-goal?]{
+ Constructs a @tech{multiset goal}.}
