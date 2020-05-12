@@ -60,8 +60,8 @@ state representations:
   @rebellion-tech{multiset} and actions add and remove multiple copies of
   elements at a time. Goals are expressed in terms of desired quantities of
   different elements. This representation is highly effective in planning
-  domains that involve some sort of resource and inventory management, such as
-  chemical processing or videogame crafting systems.}
+  domains that involve some sort of resource production or inventory management,
+  such as chemical processing or videogame crafting systems.}
 
  @item{The @deftech{hash table state representation}, where the world state is a
   @reference-tech{hash table} and actions add and remove key-value entries to
