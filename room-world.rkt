@@ -15,7 +15,7 @@
 
 ;; TODO: add provides for the rest of the stuff in this module
 
-(require planning/action
+(require planning/action/set
          racket/set
          rebellion/type/enum
          rebellion/type/tuple)
@@ -41,24 +41,24 @@
 (define-tuple-type is-closed (subject-door))
 
 (define move-left
-  (action #:requirements
-          (set (is-player player)
-               (is-room left-room)
-               (is-room right-room)
-               (is-door door)
-               (at player right-room)
-               (is-empty left-room))
-          #:obstructors
-          (set (is-closed door))
-          #:additions
-          (set (at player left-room)
-               (is-empty right-room))
-          #:deletions
-          (set (at player right-room)
-               (is-empty left-room))))
+  (set-action #:requirements
+              (set (is-player player)
+                   (is-room left-room)
+                   (is-room right-room)
+                   (is-door door)
+                   (at player right-room)
+                   (is-empty left-room))
+              #:obstructors
+              (set (is-closed door))
+              #:additions
+              (set (at player left-room)
+                   (is-empty right-room))
+              #:deletions
+              (set (at player right-room)
+                   (is-empty left-room))))
 
 (define move-right
-  (action
+  (set-action
    #:requirements
    (set (is-player player)
         (is-room left-room)
@@ -76,7 +76,7 @@
         (is-empty right-room))))
 
 (define open-door
-  (action
+  (set-action
    #:requirements
    (set (is-player player)
         (is-door door)
@@ -85,7 +85,7 @@
    (set (is-closed door))))
 
 (define close-door
-  (action
+  (set-action
    #:requirements
    (set (is-player player)
         (is-door door))
@@ -129,8 +129,8 @@
        (is-closed door)))
 
 (module+ test
-  (test-case "action-execute"
-    (check-equal? (action-execute move-left door-open-player-right)
+  (test-case "set-action-perform"
+    (check-equal? (set-action-perform move-left door-open-player-right)
                   door-open-player-left)
-    (check-equal? (action-execute move-right door-open-player-left)
+    (check-equal? (set-action-perform move-right door-open-player-left)
                   door-open-player-right)))

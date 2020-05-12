@@ -9,7 +9,10 @@
               "planning")))
 
 (define deps
-  (list "rebellion"
+  (list "chess"
+        "fancy-app"
+        "point-free"
+        "rebellion"
         "base"))
 
 (define build-deps

@@ -23,13 +23,16 @@
          planning/action/multiset
          planning/goal/multiset
          planning/private
+         racket/match
          racket/sequence
          racket/set
          rebellion/base/option
          rebellion/collection/list
          rebellion/collection/multiset
+         rebellion/collection/set
          rebellion/private/strict-cond
-         rebellion/type/record)
+         rebellion/type/record
+         rebellion/type/tuple)
 
 ;@------------------------------------------------------------------------------
 
@@ -43,6 +46,34 @@
    #:state state
    #:actions (sequence->set actions)
    #:goal goal))
+
+(define-tuple-type plan (reversed-steps predicted-state))
+(define empty-plan (plan empty-list _))
+
+(define (initial-frontier initial-state) (list (empty-plan initial-state)))
+
+(define (deterministic-search action-applicable? action-perform goal-achieved?)
+  
+  (define (plan-children node actions)
+    (match-define (plan steps state) node)
+    (for/list ([action (in-list actions)]
+               #:when (action-applicable? action state))
+      (plan (list-insert steps action) (action-perform action state))))
+
+  (define (search actions initial-state goal)
+    (let loop ([frontier (initial-frontier initial-state)] [expanded empty-set])
+      (match frontier
+        [(list) absent]
+        [(cons (plan steps state) _)
+         #:when (goal-achieved? goal state)
+         (present (list-reverse steps))]
+        [(cons (and node (plan steps state)) frontier-remaining)
+         (define children (plan-children node))
+         (define new-frontier (list-append frontier-remaining children))
+         (loop new-frontier (set-add expanded node))])))
+
+  search)
+       
 
 (define (multiset-planning-problem-solve problem)
   (define actions (sequence->list (multiset-planning-problem-actions problem)))
