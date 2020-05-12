@@ -77,5 +77,3 @@ representations to be easier to work with than variable-oriented
 representations, but only partly. Mostly it's because it's more complicated and
 I never had much personal interest in it. If you wish to use a state variable
 representation, please reach out to me so I can learn more about your use case.
-
-@include-section[(lib "planning/action.scrbl")]
