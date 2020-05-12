@@ -20,8 +20,8 @@
    (-> multiset-planning-problem? (option/c (listof multiset-action?)))]))
 
 (require fancy-app
-         planning/action/multiset
-         planning/goal/multiset
+         planning/multiset/action
+         planning/multiset/goal
          planning/private
          racket/match
          racket/sequence

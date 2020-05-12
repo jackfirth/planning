@@ -15,7 +15,7 @@
 
 ;; TODO: add provides for the rest of the stuff in this module
 
-(require planning/action/set
+(require planning/set/action
          racket/set
          rebellion/type/enum
          rebellion/type/tuple)

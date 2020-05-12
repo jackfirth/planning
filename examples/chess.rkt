@@ -1,7 +1,7 @@
 #lang racket
 
 (require chess
-         planning/action/hash
+         planning/hash/action
          rebellion/collection/multidict)
 
 ;@------------------------------------------------------------------------------

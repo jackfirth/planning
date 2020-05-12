@@ -2,9 +2,9 @@
 
 (module+ test
   (require fancy-app
-           planning/action/multiset
-           planning/goal/multiset
-           planning/problem/multiset
+           planning/multiset/action
+           planning/multiset/goal
+           planning/multiset/problem
            racket/set
            rackunit
            rebellion/base/option
