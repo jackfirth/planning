@@ -65,7 +65,7 @@ state representations:
 
  @item{The @deftech{hash table state representation}, where the world state is a
   @reference-tech{hash table} and actions add and remove key-value entries to
-  and from the hash table. Goals are expressed in terms of desired or undesired
+  and from the hash table. Goals are expressed in terms of desired and undesired
   keys and entries. This representation is fairly effective at modeling objects
   located at different positions in the world, such as pieces on a game board or
   boxes in a shipping warehouse.}]
