@@ -22,7 +22,7 @@
 (module+ doc
   (provide
    (contract-out
-    [racket-reference-tech (-> pre-content? ... element?)]
+    [reference-tech (-> pre-content? ... element?)]
     [rebellion-tech (-> pre-content? ... element?)])))
 
 (require racket/set
@@ -73,7 +73,7 @@
     (multiset-set-frequency set v freq)))
 
 (module+ doc
-  (define (racket-reference-tech . text)
+  (define (reference-tech . text)
     (apply tech #:doc '(lib "scribblings/reference/reference.scrbl") text))
 
   (define (rebellion-tech . text)
