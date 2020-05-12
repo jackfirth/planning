@@ -15,6 +15,16 @@ playing board games to piloting spacecraft. The @racketmodname[planning] library
 is an attempt to make the tools and techniques of automated planning available
 to Racketeers.
 
+@subsection{Status of This Library}
+
+As of early 2020 I'm building this in my spare time for fun. It is woefully
+incomplete, and I only plan to use it in the context of a few games I happen to
+be playing (and making) lately. If you would like to use it for something more
+serious, that's great! But please contact me first (at the email address in the
+package description) to give me a heads up, otherwise you run the risk of me
+breaking your code on a whim because I'm assuming this package has no other
+users.
+
 @table-of-contents[]
 
 @section{Basic Terminology}
