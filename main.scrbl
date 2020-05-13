@@ -8,6 +8,7 @@
                      racket/contract/base
                      racket/math
                      racket/set
+                     rebellion/base/option
                      rebellion/base/range
                      rebellion/collection/hash
                      rebellion/collection/multiset
