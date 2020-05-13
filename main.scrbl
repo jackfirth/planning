@@ -1,7 +1,24 @@
 #lang scribble/manual
 
-@(require (for-label planning)
-          (submod planning/private doc))
+@(require (for-label planning
+                     planning/multiset/action
+                     planning/multiset/goal
+                     racket/base
+                     racket/contract/base
+                     racket/math
+                     rebellion/base/range
+                     rebellion/collection/hash
+                     rebellion/collection/multiset
+                     rebellion/collection/set)
+          (submod planning/private doc)
+          scribble/example)
+
+@(define make-evaluator
+   (make-module-sharing-evaluator-factory
+    #:public (list 'planning/multiset/action
+                   'rebellion/base/range
+                   'rebellion/collection/multiset)
+    #:private (list 'racket/base)))
 
 @title{Automated Planning}
 @defmodule[planning]
@@ -116,20 +133,40 @@ Multiset actions have four components:
   corresponding value is a natural number that determines how many copies of the
   element the multiset will contain after the action is performed.}]
 
+@defproc[(multiset-action? [v any/c]) boolean?]{
+ A predicate for @tech{multiset actions}.}
+
 @defproc[(multiset-action
           [#:preconditions preconditions (hash/c any/c range?) empty-hash]
           [#:deletions deletions multiset? empty-multiset]
           [#:additions additions multiset? empty-multiset]
-          [#:replacements replacements (hash/c any/c nonnegative-integer?)
-           empty-hash])
+          [#:replacements replacements (hash/c any/c natural?)
+           empty-hash]
+          [#:cost cost (>=/c 0) 1])
          multiset-action?]{
- Constructs a @tech{multiset action}.}
+ Constructs a @tech{multiset action}.
+
+ @(examples
+   #:eval (make-evaluator)
+   (eval:no-prompt
+    (define make-water
+      (multiset-action
+       #:preconditions (hash 'hydrogen (at-least-range 2)
+                             'oxygen (at-least-range 1))
+       #:additions (multiset 'water)
+       #:deletions (multiset 'hydrogen 'hydrogen 'oxygen))))
+   (multiset-action-perform make-water
+                            (multiset 'hydrogen 'hydrogen 'oxygen 'carbon)))}
 
 @subsection{Multiset Goals}
+@defmodule[planning/multiset/goal]
 
 A @deftech{multiset goal} is a @tech{goal} in the
 @tech{multiset state representation}. Multiset goals contain only a hash of
 preconditions of the same form as the preconditions in a @tech{multiset action}.
+
+@defproc[(multiset-goal? [v any/c]) boolean?]{
+ A predicate for @tech{multiset goals}.}
 
 @defproc[(multiset-goal [preconditions (hash/c any/c range?)]) multiset-goal?]{
  Constructs a @tech{multiset goal}.}

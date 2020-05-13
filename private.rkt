@@ -23,17 +23,24 @@
   (provide
    (contract-out
     [reference-tech (-> pre-content? ... element?)]
-    [rebellion-tech (-> pre-content? ... element?)])))
+    [rebellion-tech (-> pre-content? ... element?)]
+    [make-module-sharing-evaluator-factory
+     (->* ()
+          (#:private (listof module-path?)
+           #:public (listof module-path?))
+          (-> (-> any/c any)))])))
 
 (require racket/set
          racket/sequence
          rebellion/collection/entry
          rebellion/collection/hash
+         rebellion/collection/list
          rebellion/collection/multiset)
 
 (module+ doc
   (require scribble/core
            scribble/decode
+           scribble/example
            scribble/manual))
 
 ;@------------------------------------------------------------------------------
@@ -77,4 +84,14 @@
     (apply tech #:doc '(lib "scribblings/reference/reference.scrbl") text))
 
   (define (rebellion-tech . text)
-    (apply tech #:doc '(lib "rebellion/main.scrbl") text)))
+    (apply tech #:doc '(lib "rebellion/main.scrbl") text))
+
+  (define (make-module-sharing-evaluator-factory
+           #:public [public-modules empty-list]
+           #:private [private-modules empty-list])
+    (define base-factory
+      (make-base-eval-factory (append private-modules public-modules)))
+    (λ ()
+      (define evaluator (base-factory))
+      (evaluator `(require ,@public-modules))
+      evaluator)))

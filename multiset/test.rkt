@@ -30,12 +30,12 @@
   (define-enum-type material (copper silver gold))
 
   (define transmute-copper-into-silver
-    (multiset-action #:requirements (hash copper (at-least-range 10))
+    (multiset-action #:preconditions (hash copper (at-least-range 10))
                      #:deletions (multiset-of-copies copper 10)
                      #:additions (multiset silver)))
 
   (define transmute-silver-into-gold
-    (multiset-action #:requirements (hash silver (at-least-range 10))
+    (multiset-action #:preconditions (hash silver (at-least-range 10))
                      #:deletions (multiset-of-copies silver 10)
                      #:additions (multiset gold)))
 

@@ -6,18 +6,20 @@
  (contract-out
   [multiset-action
    (->i ()
-        (#:additions [additions multiset?]
+        (#:preconditions [preconditions (hash/c any/c range? #:immutable #t)]
          #:deletions [deletions multiset?]
+         #:additions [additions multiset?]
          #:replacements [replacements (hash/c any/c natural? #:immutable #t)]
-         #:requirements [requirements (hash/c any/c range? #:immutable #t)])
+         #:cost [cost (>=/c 0)])
         [_ multiset-action?])]
   [multiset-action? predicate/c]
-  [multiset-action-additions (-> multiset-action? multiset?)]
+  [multiset-action-preconditions
+   (-> multiset-action? (hash/c any/c range? #:immutable #t))]
   [multiset-action-deletions (-> multiset-action? multiset?)]
+  [multiset-action-additions (-> multiset-action? multiset?)]
   [multiset-action-replacements
    (-> multiset-action? (hash/c any/c natural? #:immutable #t))]
-  [multiset-action-requirements
-   (-> multiset-action? (hash/c any/c range? #:immutable #t))]
+  [multiset-action-cost (-> multiset-action? (>=/c 0))]
   [multiset-action-applicable? (-> multiset-action? multiset? boolean?)]
   [multiset-action-perform (-> multiset-action? multiset? multiset?)]))
 
@@ -33,22 +35,24 @@
 ;@------------------------------------------------------------------------------
 
 (define-record-type multiset-action
-  (additions deletions replacements requirements)
+  (additions deletions replacements preconditions cost)
   #:omit-root-binding)
 
-(define (multiset-action #:additions [additions empty-multiset]
+(define (multiset-action #:preconditions [preconditions empty-hash]
                          #:deletions [deletions empty-multiset]
+                         #:additions [additions empty-multiset]
                          #:replacements [replacements empty-hash]
-                         #:requirements [requirements empty-hash])
+                         #:cost [cost 1])
   (constructor:multiset-action
-   #:additions additions
+   #:preconditions preconditions
    #:deletions deletions
+   #:additions additions
    #:replacements replacements
-   #:requirements requirements))
+   #:cost 1))
 
 (define (multiset-action-applicable? action state-multiset)
-  (define requirements (multiset-action-requirements action))
-  (for/and ([(element acceptable-frequencies) (in-immutable-hash requirements)])
+  (for/and ([(element acceptable-frequencies)
+             (in-immutable-hash (multiset-action-preconditions action))])
     (define freq (multiset-frequency state-multiset element))
     (range-contains? acceptable-frequencies freq)))
 
