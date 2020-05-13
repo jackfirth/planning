@@ -21,15 +21,20 @@
    (-> multiset-action? (hash/c any/c natural? #:immutable #t))]
   [multiset-action-cost (-> multiset-action? (>=/c 0))]
   [multiset-action-applicable? (-> multiset-action? multiset? boolean?)]
-  [multiset-action-perform (-> multiset-action? multiset? multiset?)]))
+  [multiset-action-perform (-> multiset-action? multiset? multiset?)]
+  [multiset-action-perform-all
+   (-> (sequence/c multiset-action?) multiset? (listof multiset?))]))
 
 (require fancy-app
          planning/private
          point-free
          racket/math
+         racket/sequence
          rebellion/base/range
          rebellion/collection/hash
+         rebellion/collection/list
          rebellion/collection/multiset
+         rebellion/streaming/transducer
          rebellion/type/record)
 
 ;@------------------------------------------------------------------------------
@@ -50,16 +55,21 @@
    #:replacements replacements
    #:cost 1))
 
-(define (multiset-action-applicable? action state-multiset)
+(define (multiset-action-applicable? action state)
   (for/and ([(element acceptable-frequencies)
              (in-immutable-hash (multiset-action-preconditions action))])
-    (define freq (multiset-frequency state-multiset element))
+    (define freq (multiset-frequency state element))
     (range-contains? acceptable-frequencies freq)))
 
-(define (multiset-action-perform action state-multiset)
+(define (multiset-action-perform action state)
   (define deletions (multiset-action-deletions action))
   (define additions (multiset-action-additions action))
   (define replacements (multiset-action-replacements action))
-  (~> (multiset-remove-all state-multiset deletions)
+  (~> (multiset-remove-all state deletions)
       (multiset-add-all _ additions)
       (multiset-set-all-frequencies _ replacements)))
+
+(define (multiset-action-perform-all actions state)
+  (define performing-actions
+    (folding (λ (state action) (multiset-action-perform action state)) state))
+  (list-insert (transduce actions performing-actions #:into into-list) state))

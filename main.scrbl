@@ -7,10 +7,12 @@
                      racket/base
                      racket/contract/base
                      racket/math
+                     racket/pretty
                      racket/set
                      rebellion/base/option
                      rebellion/base/range
                      rebellion/collection/hash
+                     rebellion/collection/list
                      rebellion/collection/multiset
                      rebellion/collection/set
                      rebellion/type/enum)
@@ -22,8 +24,11 @@
     #:public (list 'planning/multiset/action
                    'planning/multiset/goal
                    'planning/multiset/problem
+                   'racket/pretty
                    'racket/set
+                   'rebellion/base/option
                    'rebellion/base/range
+                   'rebellion/collection/list
                    'rebellion/collection/multiset
                    'rebellion/type/enum)
     #:private (list 'racket/base)))
@@ -224,25 +229,26 @@ that will transform the multiset into a multiset that satisfies the goal.
  @(examples
    #:eval (make-evaluator)
    (eval:no-prompt
-    (define-enum-type matter (water hydrogen oxygen peroxide))
-
     (define destroy-water
       (multiset-action
-       #:preconditions (hash water (at-least-range 1))
-       #:deletions (multiset water)
-       #:additions (multiset hydrogen hydrogen oxygen)))
+       #:preconditions (hash 'water (at-least-range 1))
+       #:deletions (multiset 'water)
+       #:additions (multiset 'hydrogen 'hydrogen 'oxygen)))
 
     (define create-peroxide
       (multiset-action
-       #:preconditions (hash hydrogen (at-least-range 2)
-                             oxygen (at-least-range 2))
-       #:deletions (multiset hydrogen hydrogen oxygen oxygen)
-       #:additions (multiset peroxide)))
+       #:preconditions (hash 'hydrogen (at-least-range 2)
+                             'oxygen (at-least-range 2))
+       #:deletions (multiset 'hydrogen 'hydrogen 'oxygen 'oxygen)
+       #:additions (multiset 'peroxide)))
+
+    (define initial-state (multiset 'water 'water))
     
     (define create-peroxide-from-water
       (multiset-planning-problem
-       #:state (multiset water water water)
+       #:state initial-state
        #:actions (set destroy-water create-peroxide)
-       #:goal (multiset-goal (hash peroxide (singleton-range 1))))))
+       #:goal (multiset-goal (hash 'peroxide (singleton-range 1))))))
 
-   (multiset-plan create-peroxide-from-water))}
+   (define the-plan (multiset-plan create-peroxide-from-water))
+   (multiset-action-perform-all (present-value the-plan) initial-state))}
