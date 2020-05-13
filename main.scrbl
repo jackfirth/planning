@@ -3,21 +3,28 @@
 @(require (for-label planning
                      planning/multiset/action
                      planning/multiset/goal
+                     planning/multiset/problem
                      racket/base
                      racket/contract/base
                      racket/math
+                     racket/set
                      rebellion/base/range
                      rebellion/collection/hash
                      rebellion/collection/multiset
-                     rebellion/collection/set)
+                     rebellion/collection/set
+                     rebellion/type/enum)
           (submod planning/private doc)
           scribble/example)
 
 @(define make-evaluator
    (make-module-sharing-evaluator-factory
     #:public (list 'planning/multiset/action
+                   'planning/multiset/goal
+                   'planning/multiset/problem
+                   'racket/set
                    'rebellion/base/range
-                   'rebellion/collection/multiset)
+                   'rebellion/collection/multiset
+                   'rebellion/type/enum)
     #:private (list 'racket/base)))
 
 @title{Automated Planning}
@@ -170,3 +177,71 @@ preconditions of the same form as the preconditions in a @tech{multiset action}.
 
 @defproc[(multiset-goal [preconditions (hash/c any/c range?)]) multiset-goal?]{
  Constructs a @tech{multiset goal}.}
+
+@subsection{Multiset Planning Problems}
+@defmodule[planning/multiset/problem]
+
+A @deftech{multiset planning problem} is a combination of a
+@rebellion-tech{multiset}, a set of @tech{multiset actions}, and a
+@tech{multiset goal}. A solution to the problem is a list of actions to perform
+that will transform the multiset into a multiset that satisfies the goal.
+
+@defproc[(multiset-planning-problem? [v any/c]) boolean?]{
+ A predicate for @tech{multiset planning problems}.}
+
+@defproc[(multiset-planning-problem
+          [#:state state multiset?]
+          [#:actions actions (set/c multiset-action?)]
+          [#:goal goal multiset-goal?])
+         multiset-planning-problem?]{
+ Constructs a @tech{multiset planning problem}.}
+
+@defproc[(multiset-planning-problem-state [problem multiset-planning-problem?])
+         multiset?]{
+ Returns the @rebellion-tech{multiset} representing the initial state in
+ @racket[problem].}
+
+@defproc[(multiset-planning-problem-actions
+          [problem multiset-planning-problem?])
+         (set/c multiset-action?)]{
+ Returns the @tech{multiset actions} that may be performed as part of a plan for
+ @racket[problem].}
+
+@defproc[(multiset-planning-problem-goal [problem multiset-planning-problem?])
+         multiset-goal?]{
+ Returns the @tech{multiset goal} that a plan for @racket[problem] must
+ achieve.}
+
+@defproc[(multiset-plan [problem multiset-planning-problem?])
+         (option/c (listof multiset-action?))]{
+ Attempts to solve @racket[problem] and return a plan in the form of a list of
+ actions to take to achieve the problem's goal. A solution may not exist. The
+ current planner is not implemented efficiently, so it is possible to construct
+ multiset problems that take too long to solve or for which the planner fails to
+ terminate.
+
+ @(examples
+   #:eval (make-evaluator)
+   (eval:no-prompt
+    (define-enum-type matter (water hydrogen oxygen peroxide))
+
+    (define destroy-water
+      (multiset-action
+       #:preconditions (hash water (at-least-range 1))
+       #:deletions (multiset water)
+       #:additions (multiset hydrogen hydrogen oxygen)))
+
+    (define create-peroxide
+      (multiset-action
+       #:preconditions (hash hydrogen (at-least-range 2)
+                             oxygen (at-least-range 2))
+       #:deletions (multiset hydrogen hydrogen oxygen oxygen)
+       #:additions (multiset peroxide)))
+    
+    (define create-peroxide-from-water
+      (multiset-planning-problem
+       #:state (multiset water water water)
+       #:actions (set destroy-water create-peroxide)
+       #:goal (multiset-goal (hash peroxide (singleton-range 1))))))
+
+   (multiset-plan create-peroxide-from-water))}

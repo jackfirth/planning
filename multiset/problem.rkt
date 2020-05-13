@@ -16,7 +16,7 @@
    (-> multiset-planning-problem? (set/c multiset-action?))]
   [multiset-planning-problem-goal
    (-> multiset-planning-problem? multiset-goal?)]
-  [multiset-planning-problem-solve
+  [multiset-plan
    (-> multiset-planning-problem? (option/c (listof multiset-action?)))]))
 
 (require fancy-app
@@ -73,9 +73,9 @@
          (loop new-frontier (set-add expanded node))])))
 
   search)
-       
 
-(define (multiset-planning-problem-solve problem)
+
+(define (multiset-plan problem)
   (define actions (sequence->list (multiset-planning-problem-actions problem)))
   (define goal (multiset-planning-problem-goal problem))
   (let loop ([state (multiset-planning-problem-state problem)]

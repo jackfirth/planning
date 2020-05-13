@@ -46,7 +46,7 @@
        #:actions (set transmute-copper-into-silver transmute-silver-into-gold)
        #:goal (multiset-goal (hash gold (singleton-range 1)))))
     (check-equal?
-     (multiset-planning-problem-solve problem)
+     (multiset-plan problem)
      (present
       (list transmute-copper-into-silver
             transmute-copper-into-silver
