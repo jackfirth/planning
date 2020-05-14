@@ -4,6 +4,7 @@
 
 (provide
  (contract-out
+  [multiset-act (-> multiset? multiset-action? multiset?)]
   [multiset-action
    (->i ()
         (#:preconditions [preconditions (hash/c any/c range? #:immutable #t)]
@@ -21,7 +22,6 @@
    (-> multiset-action? (hash/c any/c natural? #:immutable #t))]
   [multiset-action-cost (-> multiset-action? (>=/c 0))]
   [multiset-action-applicable? (-> multiset-action? multiset? boolean?)]
-  [multiset-action-perform (-> multiset-action? multiset? multiset?)]
   [multiset-action-perform-all
    (-> (sequence/c multiset-action?) multiset? (listof multiset?))]))
 
@@ -61,7 +61,7 @@
     (define freq (multiset-frequency state element))
     (range-contains? acceptable-frequencies freq)))
 
-(define (multiset-action-perform action state)
+(define (multiset-act state action)
   (define deletions (multiset-action-deletions action))
   (define additions (multiset-action-additions action))
   (define replacements (multiset-action-replacements action))
@@ -71,5 +71,5 @@
 
 (define (multiset-action-perform-all actions state)
   (define performing-actions
-    (folding (λ (state action) (multiset-action-perform action state)) state))
+    (folding multiset-act state))
   (list-insert (transduce actions performing-actions #:into into-list) state))

@@ -87,9 +87,8 @@
        (define next-action (list-first unconsidered-actions))
        (cond
          [(multiset-action-applicable? next-action state)
-          (define next-state (multiset-action-perform next-action state))
           (option-case
-           (loop next-state actions)
+           (loop (multiset-act state next-action) actions)
            #:present (λ (plan) (present (list-insert plan next-action)))
            #:absent (λ () (loop state (list-rest unconsidered-actions))))]
          [else (loop state (list-rest unconsidered-actions))])])))

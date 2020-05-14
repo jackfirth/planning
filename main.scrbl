@@ -168,8 +168,26 @@ Multiset actions have four components:
                              'oxygen (at-least-range 1))
        #:additions (multiset 'water)
        #:deletions (multiset 'hydrogen 'hydrogen 'oxygen))))
-   (multiset-action-perform make-water
-                            (multiset 'hydrogen 'hydrogen 'oxygen 'carbon)))}
+   (multiset-act (multiset 'hydrogen 'hydrogen 'oxygen 'carbon) make-water))}
+
+@defproc[(multiset-act [set multiset?] [action multiset-action?]) multiset?]{
+ Performs @racket[action] on @racket[set], returning a new multiset. The action
+ must be @tech{applicable} to @racket[set] or else a contract error is raised.}
+
+@defproc[(multiset-action-applicable? [action multiset-action?] [set multiset?])
+         boolean?]{
+ Determines whether @racket[action] is applicable to @racket[set], based on
+ whether the preconditions of @racket[action] are satisfied.
+
+ @(examples
+   #:eval (make-evaluator)
+   (define red-to-blue
+     (multiset-action
+      #:preconditions (hash 'red (at-least-range 1))
+      #:additions (multiset 'blue)
+      #:deletions (multiset 'red)))
+   (multiset-action-applicable? red-to-blue (multiset 'red))
+   (multiset-action-applicable? red-to-blue (multiset 'green)))}
 
 @subsection{Multiset Goals}
 @defmodule[planning/multiset/goal]
