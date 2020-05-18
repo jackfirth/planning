@@ -9,7 +9,10 @@
               "planning")))
 
 (define deps
-  (list "chess"
+  (list "gui-lib"
+        "pict-lib"
+        "slideshow-lib"
+        "chess"
         "fancy-app"
         "point-free"
         "rebellion"
