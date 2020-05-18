@@ -6,19 +6,16 @@
          planning/hash/problem
          planning/private/animation
          racket/match
-         racket/math
          racket/set
          rebellion/base/option
          rebellion/collection/entry
          rebellion/collection/hash
          rebellion/collection/list
          rebellion/collection/multidict
-         rebellion/collection/vector
          rebellion/streaming/reducer
          rebellion/streaming/transducer
          rebellion/type/enum
-         rebellion/type/tuple
-         slideshow/play)
+         rebellion/type/tuple)
 
 ;@------------------------------------------------------------------------------
 
@@ -68,9 +65,15 @@
              [action-maker (in-list (list move push))])
     (action-maker (space r c) finder)))
 
+(define block-size 50)
+(define board-rows 4)
+(define board-columns 4)
+(define board-width (* board-columns block-size))
+(define board-height (* board-rows block-size))
+
 (define player-pict
-  (cc-superimpose (blank 50)
-                  (filled-rectangle 40 40
+  (cc-superimpose (blank block-size)
+                  (filled-rectangle (* block-size 4/5) (* block-size 4/5)
                                     #:color "white"
                                     #:draw-border? #t
                                     #:border-color "black"
@@ -78,8 +81,8 @@
                   (text "P")))
 
 (define block-pict
-  (cc-superimpose (blank 50)
-                  (filled-rectangle 40 40
+  (cc-superimpose (blank block-size)
+                  (filled-rectangle (* block-size 4/5) (* block-size 4/5)
                                     #:color "white"
                                     #:draw-border? #t
                                     #:border-color "black"
@@ -91,8 +94,10 @@
     (make-fold-reducer
      (λ (bkg e)
        (match-define (entry (space r c) p) e)
-       (pin-over bkg (* c 50) (+ 150 (* (add1 r) -50)) p))
-     (rectangle 150 150)))
+       (define x (* c block-size))
+       (define y (+ board-height (* (add1 r) (- block-size))))
+       (pin-over bkg x y p))
+     (rectangle board-width board-height)))
   (transduce (in-hash-entries state)
              (mapping-values
               (λ (obj)
@@ -106,10 +111,8 @@
     (hash (space 0 0) player
           (space 1 1) block))
 
-  (define actions (block-world-actions 3 3))
-
-  (define goal
-    (hash-goal #:requirements (multidict (space 2 2) block)))
+  (define actions (block-world-actions board-rows board-columns))
+  (define goal (hash-goal #:requirements (multidict (space 3 3) block)))
 
   (define plan
     (hash-plan
