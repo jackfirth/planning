@@ -1,28 +1,19 @@
 #lang racket/base
 
-(require racket/contract/base)
-
-(provide
- (contract-out
-  [room-world-object? predicate/c]
-  [player room-world-object?]
-  [left-room room-world-object?]
-  [right-room room-world-object?]
-  [door room-world-object?]
-  [is-player? predicate/c]
-  [is-player (-> room-world-object? is-player?)]
-  [is-player-claimed-player (-> is-player? room-world-object?)]))
-
-;; TODO: add provides for the rest of the stuff in this module
-
-(require planning/set/action
+(require planning/hash/action
+         planning/hash/goal
+         planning/hash/problem
+         racket/match
          racket/set
+         rebellion/collection/hash
+         rebellion/collection/multidict
          rebellion/type/enum
          rebellion/type/tuple)
 
 (module+ test
   (require (submod "..")
-           rackunit))
+           rackunit
+           rebellion/base/option))
 
 ;@------------------------------------------------------------------------------
 ;; The Room World contains two rooms, a door between them, and a player object
@@ -30,107 +21,68 @@
 ;; door is open, as well as open and close the door. This simple world is mainly
 ;; useful for planning demonstrations and testing.
 
-(define-enum-type room-world-object
-  (player left-room right-room door))
-
-(define-tuple-type is-player (claimed-player))
-(define-tuple-type is-room (claimed-room))
-(define-tuple-type is-door (claimed-door))
-(define-tuple-type at (subject stated-position))
-(define-tuple-type is-empty (subject-room))
-(define-tuple-type is-closed (subject-door))
+(define-enum-type object (player door))
+(define-enum-type place (left-room right-room doorway))
 
 (define move-left
-  (set-action #:requirements
-              (set (is-player player)
-                   (is-room left-room)
-                   (is-room right-room)
-                   (is-door door)
-                   (at player right-room)
-                   (is-empty left-room))
-              #:obstructors
-              (set (is-closed door))
-              #:additions
-              (set (at player left-room)
-                   (is-empty right-room))
-              #:deletions
-              (set (at player right-room)
-                   (is-empty left-room))))
+  (hash-action #:requirements (multidict right-room player)
+               #:obstructions (multidict doorway door)
+               #:obstructing-keys (set left-room)
+               #:deletions (set right-room)
+               #:additions (hash left-room player)))
 
 (define move-right
-  (set-action
-   #:requirements
-   (set (is-player player)
-        (is-room left-room)
-        (is-room right-room)
-        (is-door door)
-        (at player left-room)
-        (is-empty right-room))
-   #:obstructors
-   (set (is-closed door))
-   #:additions
-   (set (at player right-room)
-        (is-empty left-room))
-   #:deletions
-   (set (at player left-room)
-        (is-empty right-room))))
-
-(define open-door
-  (set-action
-   #:requirements
-   (set (is-player player)
-        (is-door door)
-        (is-closed door))
-   #:deletions
-   (set (is-closed door))))
+  (hash-action #:requirements (multidict left-room player)
+               #:obstructions (multidict doorway door)
+               #:obstructing-keys (set right-room)
+               #:deletions (set left-room)
+               #:additions (hash right-room player)))
 
 (define close-door
-  (set-action
-   #:requirements
-   (set (is-player player)
-        (is-door door))
-   #:obstructors
-   (set (is-closed door))
-   #:additions
-   (set (is-closed door))))
+  (hash-action #:obstructing-keys (set doorway)
+               #:additions (hash doorway door)))
 
-(define door-open-player-left
-  (set (is-player player)
-       (is-room left-room)
-       (is-room right-room)
-       (is-door door)
-       (at player left-room)
-       (is-empty right-room)))
-
-(define door-open-player-right
-  (set (is-player player)
-       (is-room left-room)
-       (is-room right-room)
-       (is-door door)
-       (at player right-room)
-       (is-empty left-room)))
-
-(define door-closed-player-left
-  (set (is-player player)
-       (is-room left-room)
-       (is-room right-room)
-       (is-door door)
-       (at player left-room)
-       (is-empty right-room)
-       (is-closed door)))
-
-(define door-closed-player-right
-  (set (is-player player)
-       (is-room left-room)
-       (is-room right-room)
-       (is-door door)
-       (at player right-room)
-       (is-empty left-room)
-       (is-closed door)))
+(define open-door
+  (hash-action #:requirements (multidict doorway door)
+               #:deletions (set doorway)))
 
 (module+ test
-  (test-case "set-action-perform"
-    (check-equal? (set-action-perform move-left door-open-player-right)
-                  door-open-player-left)
-    (check-equal? (set-action-perform move-right door-open-player-left)
-                  door-open-player-right)))
+  (test-case "move-left"
+    (test-case "door is open"
+      (define world (hash right-room player))
+      (check-true (hash-action-applicable? move-left world))
+      (check-equal? (hash-act world move-left) (hash left-room player)))
+
+    (test-case "door is closed"
+      (define world (hash right-room player doorway door))
+      (check-false (hash-action-applicable? move-left world))))
+
+  (test-case "move-right"
+    (test-case "door is open"
+      (define world (hash left-room player))
+      (check-true (hash-action-applicable? move-right world))
+      (check-equal? (hash-act world move-right) (hash right-room player)))
+
+    (test-case "door is closed"
+      (define world (hash left-room player doorway door))
+      (check-false (hash-action-applicable? move-right world))))
+
+  (test-case "close-door"
+    (check-true (hash-action-applicable? close-door empty-hash))
+    (check-equal? (hash-act empty-hash close-door) (hash doorway door)))
+
+  (test-case "open-door"
+    (define world (hash doorway door))
+    (check-true (hash-action-applicable? open-door world))
+    (check-equal? (hash-act world open-door) empty-hash))
+
+  (test-case "planning"
+    (define problem
+      (hash-planning-problem
+       #:state (hash left-room player doorway door)
+       #:actions (set move-left move-right close-door open-door)
+       #:goal (hash-goal #:requirements (multidict right-room player))))
+    (define expected-plan (list open-door move-right))
+    (define actual (hash-plan problem))
+    (check-pred present? actual)
+    (check-equal? (present-value actual) expected-plan)))

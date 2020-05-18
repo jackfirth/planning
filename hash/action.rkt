@@ -27,7 +27,8 @@
   [hash-action-deletions (-> hash-action? set?)]
   [hash-action-applicable? (-> hash-action? immutable-hash? boolean?)]))
 
-(require planning/private
+(require planning/hash/goal
+         planning/private
          racket/set
          rebellion/collection/hash
          rebellion/collection/multidict
@@ -66,15 +67,15 @@
    #:deletions deletions))
 
 (define (hash-action-applicable? action state-hash)
-  (define keys (hash-key-set state-hash))
-  (define requirements (hash-action-requirements action))
-  (and (set-contains-all? keys (hash-action-required-keys action))
-       (set-contains-none? keys (hash-action-obstructing-keys action))
-       (for/and ([k (in-immutable-set (multidict-unique-keys requirements))])
-         (and (hash-has-key? state-hash k)
-              (set-contains? (multidict-ref requirements k)
-                             (hash-ref state-hash k))))
-       (hash-contains-none? state-hash (hash-action-obstructions action))))
+  (define goal
+    (hash-goal
+     #:requirements (hash-action-requirements action)
+     #:required-keys (hash-action-required-keys action)
+     #:required-values (hash-action-required-values action)
+     #:obstructions (hash-action-obstructions action)
+     #:obstructing-keys (hash-action-obstructing-keys action)
+     #:obstructing-values (hash-action-obstructing-values action)))
+  (hash-goal-achieved? goal state-hash))
 
 (define (hash-act state-hash action)
   (hash-put-all (hash-remove-all state-hash (hash-action-deletions action))
