@@ -126,4 +126,7 @@
                             (folding hash-act world)
                             #:into into-list)
                  world))
-  (transduce states (mapping block-world-pict) #:into (into-animation)))
+  (define block-world-plan
+    (transduce states (mapping block-world-pict) #:into (into-animation)))
+  (convert-to-file block-world-plan 'gif-bytes "block-world-plan.gif"
+                   #:exists 'replace))
