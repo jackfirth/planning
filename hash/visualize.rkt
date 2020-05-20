@@ -39,6 +39,8 @@
              (mapping state-drawer)
              #:into (into-animation #:frame-rate frame-rate)))
 
+(module test racket/base)
+
 (module headless racket/base
 
   (require racket/contract/base)
