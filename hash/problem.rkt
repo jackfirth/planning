@@ -5,6 +5,10 @@
 (provide
  (contract-out
   [hash-plan (-> hash-planning-problem? (option/c (listof hash-action?)))]
+  [hash-visualize-plan!
+   (->* (hash-planning-problem? #:draw-state-with (-> immutable-hash? pict?))
+        (#:frame-rate (and/c rational? positive? exact?))
+       animation?)]
   [hash-planning-problem
    (-> #:state immutable-hash?
        #:actions (set/c hash-action?)
@@ -17,9 +21,11 @@
   [hash-planning-problem-goal (-> hash-planning-problem? hash-goal?)]))
 
 (require fancy-app
+         pict
          planning/hash/action
          planning/hash/goal
          planning/private
+         planning/private/animation
          racket/match
          racket/set
          racket/sequence
@@ -94,3 +100,20 @@
   (define actions (sequence->list (hash-planning-problem-actions problem)))
   (define goal (hash-planning-problem-goal problem))
   (breadth-first-search actions (hash-planning-problem-state problem) goal))
+
+(define (hash-visualize-plan! problem
+                              #:draw-state-with state-drawer
+                              #:frame-rate [frame-rate 2])
+  ;; TODO(https://github.com/jackfirth/rebellion/issues/346): Skip the
+  ;;   intermediate list by inserting the initial state directly into the
+  ;;   stream and fusing the two stream pipelines.
+  (define initial-state (hash-planning-problem-state problem))
+  (define states
+    (list-insert
+     (transduce (present-value (hash-plan problem))
+                (folding hash-act initial-state)
+                #:into into-list)
+     initial-state))
+  (transduce states
+             (mapping state-drawer)
+             #:into (into-animation #:frame-rate frame-rate)))
