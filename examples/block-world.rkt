@@ -1,5 +1,20 @@
 #lang racket/base
 
+(require racket/contract/base)
+
+(provide
+ (contract-out
+  [object? predicate/c]
+  [player object?]
+  [block object?]
+  [space? predicate/c]
+  [space (-> (integer-in 1 #f) (integer-in 1 #f) space?)]
+  [space-row (-> space? (integer-in 1 #f))]
+  [space-column (-> space? (integer-in 1 #f))]
+  [block-world-actions
+   (-> (integer-in 1 #f) (integer-in 1 #f) (set/c hash-action?))]
+  [block-world-pict (-> (hash/c space? object? #:immutable #t) pict?)]))
+
 (require pict
          planning/hash/action
          planning/hash/goal
@@ -114,19 +129,9 @@
   (define actions (block-world-actions board-rows board-columns))
   (define goal (hash-goal #:requirements (multidict (space 3 3) block)))
 
-  (define plan
-    (hash-plan
-     (hash-planning-problem #:state world #:actions actions #:goal goal)))
-
-  ;; TODO(https://github.com/jackfirth/rebellion/issues/346): Skip the
-  ;;   intermediate list by inserting the initial state directly into the
-  ;;   stream and fusing these two stream pipelines.
-  (define states
-    (list-insert (transduce (present-value plan)
-                            (folding hash-act world)
-                            #:into into-list)
-                 world))
   (define block-world-plan
-    (transduce states (mapping block-world-pict) #:into (into-animation)))
+    (hash-visualize-plan!
+     (hash-planning-problem #:state world #:actions actions #:goal goal)
+     #:draw-state-with block-world-pict))
   (convert-to-file block-world-plan 'gif-bytes "block-world-plan.gif"
                    #:exists 'replace))
