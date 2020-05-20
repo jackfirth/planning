@@ -8,29 +8,31 @@
   [player object?]
   [block object?]
   [space? predicate/c]
-  [space (-> (integer-in 1 #f) (integer-in 1 #f) space?)]
-  [space-row (-> space? (integer-in 1 #f))]
-  [space-column (-> space? (integer-in 1 #f))]
-  [block-world-actions
-   (-> (integer-in 1 #f) (integer-in 1 #f) (set/c hash-action?))]
+  [space (-> natural? natural? space?)]
+  [space-row (-> space? natural?)]
+  [space-column (-> space? natural?)]
+  [block-world-actions (-> natural? natural? (set/c hash-action?))]
   [block-world-pict (-> (hash/c space? object? #:immutable #t) pict?)]))
 
 (require pict
          planning/hash/action
          planning/hash/goal
          planning/hash/problem
-         planning/private/animation
          racket/match
+         racket/math
          racket/set
-         rebellion/base/option
          rebellion/collection/entry
          rebellion/collection/hash
-         rebellion/collection/list
          rebellion/collection/multidict
          rebellion/streaming/reducer
          rebellion/streaming/transducer
          rebellion/type/enum
          rebellion/type/tuple)
+
+(module+ main
+  (require (submod "..")
+           planning/hash/visualize
+           planning/private/animation))
 
 ;@------------------------------------------------------------------------------
 

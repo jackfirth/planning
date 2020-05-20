@@ -1,6 +1,11 @@
 #lang scribble/manual
 
 @(require (for-label planning
+                     planning/examples/block-world
+                     planning/hash/action
+                     planning/hash/goal
+                     planning/hash/problem
+                     planning/hash/visualize
                      planning/multiset/action
                      planning/multiset/goal
                      planning/multiset/problem
@@ -13,6 +18,7 @@
                      rebellion/base/range
                      rebellion/collection/hash
                      rebellion/collection/list
+                     rebellion/collection/multidict
                      rebellion/collection/multiset
                      rebellion/collection/set
                      rebellion/type/enum)
@@ -21,7 +27,12 @@
 
 @(define make-evaluator
    (make-module-sharing-evaluator-factory
-    #:public (list 'planning/multiset/action
+    #:public (list 'planning/examples/block-world
+                   'planning/hash/action
+                   'planning/hash/goal
+                   'planning/hash/problem
+                   '(submod planning/hash/visualize headless)
+                   'planning/multiset/action
                    'planning/multiset/goal
                    'planning/multiset/problem
                    'racket/pretty
@@ -29,6 +40,7 @@
                    'rebellion/base/option
                    'rebellion/base/range
                    'rebellion/collection/list
+                   'rebellion/collection/multidict
                    'rebellion/collection/multiset
                    'rebellion/type/enum)
     #:private (list 'racket/base)))
@@ -270,3 +282,53 @@ that will transform the multiset into a multiset that satisfies the goal.
 
    (define the-plan (multiset-plan create-peroxide-from-water))
    (multiset-action-perform-all (present-value the-plan) initial-state))}
+
+@section{The Hash State Representation}
+
+In the @tech{hash state representation}, the world is represented by a
+@reference-tech{hash table}. Actions and goals are represented by
+@tech{hash actions} and @tech{hash goals}.
+
+@subsection{Hash Actions}
+@defmodule[planning/hash/action]
+
+A @deftech{hash action} is an @tech{action} on @reference-tech{hash tables}.
+
+@defproc[(hash-action? [v any/c]) boolean?]{
+ A predicate for @tech{hash actions}.}
+
+@subsection{Hash Goals}
+@defmodule[planning/hash/goal]
+
+A @deftech{hash goal} is a @tech{goal} in the @tech{hash state representation}.
+
+@defproc[(hash-goal? [v any/c]) boolean?]{
+ A predicate for @tech{hash goals}.}
+
+@subsection{Hash Planning Problems}
+@defmodule[planning/hash/problem]
+
+A @deftech{hash planning problem} is a combination of a
+@reference-tech{hash table}, a set of @tech{hash actions}, and a
+@tech{hash goal}. A solution to the problem is a list of actions to perform
+that will transform the hash table into a hash table that satisfies the goal.
+
+@defproc[(hash-planning-problem? [v any/c]) boolean?]{
+ A predicate for @tech{hash planning problems}.}
+
+@section{The Block World}
+@defmodule[planning/examples/block-world]
+
+@(examples
+  #:eval (make-evaluator) #:once
+  (eval:no-prompt
+   (define world
+     (hash (space 2 1) player
+           (space 1 2) block))
+  (define goal
+    (hash-goal #:requirements (multidict (space 3 3) block (space 2 1) player)))
+  (define problem
+    (hash-planning-problem
+     #:state world #:actions (block-world-actions 4 4) #:goal goal)))
+
+  (hash-visualize-plan! problem #:draw-state-with block-world-pict))

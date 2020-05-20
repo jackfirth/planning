@@ -9,7 +9,8 @@
               "planning")))
 
 (define deps
-  (list "draw-lib"
+  (list "snip-lib"
+        "draw-lib"
         "gui-lib"
         "pict-lib"
         "slideshow-lib"
