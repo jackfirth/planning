@@ -123,6 +123,8 @@
                   [(== block) block-pict])))
              #:into pin-into-blank))
 
+(module test racket/base)
+
 (module+ main
   (define world
     (hash (space 0 0) player
