@@ -23,9 +23,10 @@
          file/convertible
          file/gif
          (except-in racket/class absent)
-         racket/gui/base
+         (only-in racket/gui/base get-the-snip-class-list timer%)
          racket/math
          racket/sequence
+         racket/snip
          rebellion/base/option
          rebellion/base/symbol
          rebellion/collection/vector
