@@ -236,3 +236,5 @@ frames, or choose a different file format."
 
 (define (into-animation #:frame-rate [frame-rate 1])
   (reducer-map (into-vector) #:range (animation _ #:frame-rate frame-rate)))
+
+(module test racket/base)
