@@ -17,7 +17,7 @@
 
 @title{The Hash State Representation}
 
-In the @tech{hash state representation}, the world is represented by a
+In the @tech{hash table state representation}, the world is represented by a
 @reference-tech{hash table}. Actions and goals are represented by
 @tech{hash actions} and @tech{hash goals}.
 
