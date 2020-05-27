@@ -131,39 +131,7 @@ I never had much personal interest in it. If you wish to use a state variable
 representation, please reach out to me so I can learn more about your use case.
 
 @include-section[(lib "planning/multiset.scrbl")]
-
-@section{The Hash State Representation}
-
-In the @tech{hash state representation}, the world is represented by a
-@reference-tech{hash table}. Actions and goals are represented by
-@tech{hash actions} and @tech{hash goals}.
-
-@subsection{Hash Actions}
-@defmodule[planning/hash/action]
-
-A @deftech{hash action} is an @tech{action} on @reference-tech{hash tables}.
-
-@defproc[(hash-action? [v any/c]) boolean?]{
- A predicate for @tech{hash actions}.}
-
-@subsection{Hash Goals}
-@defmodule[planning/hash/goal]
-
-A @deftech{hash goal} is a @tech{goal} in the @tech{hash state representation}.
-
-@defproc[(hash-goal? [v any/c]) boolean?]{
- A predicate for @tech{hash goals}.}
-
-@subsection{Hash Planning Problems}
-@defmodule[planning/hash/problem]
-
-A @deftech{hash planning problem} is a combination of a
-@reference-tech{hash table}, a set of @tech{hash actions}, and a
-@tech{hash goal}. A solution to the problem is a list of actions to perform
-that will transform the hash table into a hash table that satisfies the goal.
-
-@defproc[(hash-planning-problem? [v any/c]) boolean?]{
- A predicate for @tech{hash planning problems}.}
+@include-section[(lib "planning/hash.scrbl")]
 
 @section{The Block World}
 @defmodule[planning/examples/block-world]
