@@ -40,10 +40,12 @@
        (super-new)
        (send this set-classname "animation-snip"))))
 
+  (send (get-the-snip-class-list) add animation-snip-class)
+
   ;; Credit to https://gist.github.com/alex-hhh/d6bdc9f9b671876d6726396e3c7b05c9
   (define animation-snip%
     (class* snip% (convertible<%>)
-      (init-field frames frame-rate)
+      (init-field frames frame-rate startup-action)
       (super-new)
       (send this set-snipclass animation-snip-class)
 
@@ -73,9 +75,12 @@
         (define admin (send this get-admin))
         (when admin
           (send admin needs-update this 0 0 max-width max-height)))
-    
+
       (define/override-final (copy)
-        (new animation-snip% [frames frames-vector] [frame-rate frame-rate]))
+        (new animation-snip%
+             [frames frames-vector]
+             [frame-rate frame-rate]
+             [startup-action startup-action]))
     
       (define/override-final (get-extent dc x y w h descent space lspace rspace)
         (when w (set-box! w max-width))
@@ -137,7 +142,9 @@ frames, or choose a different file format."
       (define/public-final (convert request default)
         (case request
           [(gif-bytes) (convert-to-gif-bytes)]
-          [else default]))))
+          [else default]))
+
+      (startup-action this)))
 
   (define (gif-add-frame gifstream x y p duration-centiseconds)
     (define w (pict-width p))
@@ -185,7 +192,10 @@ frames, or choose a different file format."
   ;@----------------------------------------------------------------------------
 
   (define (animation frames #:frame-rate [frame-rate 1])
-    (new animation-snip% [frames frames] [frame-rate frame-rate]))
+    (new animation-snip%
+         [frames frames]
+         [frame-rate frame-rate]
+         [startup-action void]))
 
   (define (into-animation #:frame-rate [frame-rate 1])
     (reducer-map (into-vector) #:range (animation _ #:frame-rate frame-rate))))
@@ -215,9 +225,8 @@ frames, or choose a different file format."
          file/convertible
          'private
          racket/class
-         (only-in racket/gui/base timer%)
+         racket/gui/base
          racket/sequence
-         racket/snip
          rebellion/base/symbol
          rebellion/collection/vector
          rebellion/streaming/reducer
@@ -225,14 +234,15 @@ frames, or choose a different file format."
 
 ;@------------------------------------------------------------------------------
 
-(send (get-the-snip-class-list) add animation-snip-class)
-
 (define (animation frames #:frame-rate [frame-rate 1])
-  (define snip (new animation-snip% [frames frames] [frame-rate frame-rate]))
   (define frame-interval-milliseconds (* (/ 1 frame-rate) 1000))
-  (define (advance) (send snip advance-frame))
-  (new timer% [interval frame-interval-milliseconds] [notify-callback advance])
-  snip)
+  (define (on-start this)
+    (define (advance) (send this advance-frame))
+    (new timer%
+         [interval frame-interval-milliseconds] [notify-callback advance])
+    (void))
+  (new animation-snip%
+       [frames frames] [frame-rate frame-rate] [startup-action on-start]))
 
 (define (into-animation #:frame-rate [frame-rate 1])
   (reducer-map (into-vector) #:range (animation _ #:frame-rate frame-rate)))
