@@ -3,6 +3,7 @@
 (require racket/contract/base)
 
 (provide
+ define-external-pict
  (contract-out
   [default (-> any/c any/c any/c)]
   [sequence->set (-> (sequence/c any/c) set?)]
@@ -10,6 +11,7 @@
   [set-contains-all? (-> set? set? boolean?)]
   [set-contains-any? (-> set? set? boolean?)]
   [set-contains-none? (-> set? set? boolean?)]
+  [hash-contains? (-> hash? any/c any/c boolean?)]
   [hash-contains-none? (-> hash? (sequence/c entry?) boolean?)]
   [hash-put (-> immutable-hash? any/c any/c immutable-hash?)]
   [hash-put-all (-> immutable-hash? hash? immutable-hash?)]
@@ -30,12 +32,15 @@
            #:public (listof module-path?))
           (-> (-> any/c any)))])))
 
-(require racket/set
+(require pict
+         racket/runtime-path
+         racket/set
          racket/sequence
          rebellion/collection/entry
          rebellion/collection/hash
          rebellion/collection/list
-         rebellion/collection/multiset)
+         rebellion/collection/multiset
+         syntax/parse/define)
 
 (module+ test
   (require (submod "..")
@@ -95,6 +100,11 @@
 (define (multiset-set-all-frequencies set frequencies)
   (for/fold ([set set]) ([(v freq) (in-immutable-hash frequencies)])
     (multiset-set-frequency set v freq)))
+
+(define-simple-macro (define-external-pict name:id source:expr)
+  (begin
+    (define-runtime-path external-pict-path source)
+    (define name (bitmap external-pict-path))))
 
 (module+ doc
   (define (reference-tech . text)

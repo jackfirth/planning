@@ -25,4 +25,4 @@ users.
 @include-section[(lib "planning/overview.scrbl")]
 @include-section[(lib "planning/multiset.scrbl")]
 @include-section[(lib "planning/hash.scrbl")]
-@include-section[(lib "planning/examples/block-world.scrbl")]
+@include-section[(lib "planning/examples/sokoban.scrbl")]
