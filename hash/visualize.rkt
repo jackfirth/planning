@@ -24,7 +24,7 @@
 
 (define (hash-visualize-plan! problem
                               #:draw-state-with state-drawer
-                              #:frame-rate [frame-rate 2])
+                              #:frame-rate [frame-rate 4])
   ;; TODO(https://github.com/jackfirth/rebellion/issues/346): Skip the
   ;;   intermediate list by inserting the initial state directly into the
   ;;   stream and fusing the two stream pipelines.
@@ -40,6 +40,8 @@
              #:into (into-animation #:frame-rate frame-rate)))
 
 (module test racket/base)
+
+;@------------------------------------------------------------------------------
 
 (module headless racket/base
 
@@ -67,7 +69,7 @@
 
   (define (hash-visualize-plan! problem
                                 #:draw-state-with state-drawer
-                                #:frame-rate [frame-rate 2])
+                                #:frame-rate [frame-rate 4])
     ;; TODO(https://github.com/jackfirth/rebellion/issues/346): Skip the
     ;;   intermediate list by inserting the initial state directly into the
     ;;   stream and fusing the two stream pipelines.
