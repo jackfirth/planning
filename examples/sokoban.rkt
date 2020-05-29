@@ -336,6 +336,8 @@
           (space 1 0) wall
           (space 1 1) player
           (space 2 2) crate
+          (space 2 3) wall
+          (space 3 3) wall
           (space 4 4) storage-location))
 
   (define actions (sokoban-possible-actions state))
