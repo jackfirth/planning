@@ -4,7 +4,11 @@
                      planning/hash/goal
                      planning/hash/problem
                      racket/base
-                     racket/contract/base)
+                     racket/contract/base
+                     racket/set
+                     rebellion/collection/hash
+                     rebellion/collection/multidict
+                     rebellion/collection/set)
           (submod planning/private doc)
           scribble/example)
 
@@ -28,6 +32,17 @@ A @deftech{hash action} is an @tech{action} on @reference-tech{hash tables}.
 
 @defproc[(hash-action? [v any/c]) boolean?]{
  A predicate for @tech{hash actions}.}
+
+@defproc[(hash-action [#:requirements requirements multidict? empty-multidict]
+                      [#:required-keys required-keys set? empty-set]
+                      [#:required-values required-values set? empty-set]
+                      [#:obstructions obstructions multidict? empty-multidict]
+                      [#:obstructing-keys obstructing-keys set? empty-set]
+                      [#:obstructing-values obstructing-values set? empty-set]
+                      [#:additions additions immutable-hash? empty-hash]
+                      [#:deletions deletions set? empty-set])
+         hash-action?]{
+ Constructs a @tech{hash action}.}
 
 @section{Hash Goals}
 @defmodule[planning/hash/goal]
