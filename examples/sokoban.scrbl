@@ -6,7 +6,7 @@
                      planning/hash/problem
                      racket/base
                      racket/contract/base
-                     rebellion/collection/multidict)
+                     racket/math)
           (submod planning/private doc)
           scribble/example)
 
@@ -16,8 +16,7 @@
                    'planning/hash/action
                    'planning/hash/goal
                    'planning/hash/problem
-                   '(submod planning/hash/visualize headless)
-                   'rebellion/collection/multidict)
+                   '(submod planning/hash/visualize headless))
     #:private (list 'racket/base)))
 
 @title{Sokoban}
@@ -63,3 +62,33 @@ only if the crate isn't blocked by a wall or another crate.
       #:goal sokoban-goal)))
 
   (hash-visualize-plan! problem #:draw-state-with sokoban-pict))
+
+@defproc[(space? [v any/c]) boolean?]{
+ A predicate for grid spaces in a Sokoban level. A space is a pair of an X
+ coordinate and a Y coordinate.}
+
+@defproc[(space [x natural?] [y natural?]) space?]{
+ Constructs a grid space with @racket[x] and @racket[y] coordinates. The origin
+ @racket[(space 0 0)] represents the @bold{top left corner} of a Sokoban level.}
+
+@deftogether[[
+ @defproc[(space-x [s space?]) natural?]
+ @defproc[(space-y [s space?]) natural?]]]{
+ Returns the X and Y coordinates of @racket[s], respectively.}
+
+@defproc[(sokoban-object? [v any/c]) boolean?]{
+ A predicate for objects in the Sokoban world.}
+
+@deftogether[[
+ @defthing[wall sokoban-object?]
+ @defthing[player sokoban-object?]
+ @defthing[crate sokoban-object?]
+ @defthing[storage-location sokoban-object?]
+ @defthing[player-in-storage sokoban-object?]
+ @defthing[crate-in-storage sokoban-object?]]]{
+ The various objects that can exist in a Sokoban level. The
+ @racket[player-in-storage] and @racket[crate-in-storage] objects are like the
+ @racket[player] and @racket[crate] objects, except they represent cases where
+ the player or crate is standing on top of a storage location space. Distinct
+ objects for these cases are necessary because the Sokoban world uses the
+ @tech{hash state representation}, so a single cannot contain multiple objects.}

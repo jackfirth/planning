@@ -4,13 +4,13 @@
 
 (provide
  (contract-out
-  [object? predicate/c]
-  [player object?]
-  [player-in-storage object?]
-  [crate object?]
-  [crate-in-storage object?]
-  [wall object?]
-  [storage-location object?]
+  [sokoban-object? predicate/c]
+  [player sokoban-object?]
+  [player-in-storage sokoban-object?]
+  [crate sokoban-object?]
+  [crate-in-storage sokoban-object?]
+  [wall sokoban-object?]
+  [storage-location sokoban-object?]
   ;; TODO(feature request pending): Use (hash-goal/c space? object?) instead.
   [sokoban-goal hash-goal?]
   [space? predicate/c]
@@ -18,8 +18,8 @@
   [space-x (-> space? natural?)]
   [space-y (-> space? natural?)]
   [sokoban-possible-actions
-   (-> (hash/c space? object? #:immutable #t) (set/c hash-action?))]
-  [sokoban-pict (-> (hash/c space? object? #:immutable #t) pict?)]))
+   (-> (hash/c space? sokoban-object? #:immutable #t) (set/c hash-action?))]
+  [sokoban-pict (-> (hash/c space? sokoban-object? #:immutable #t) pict?)]))
 
 (require (for-syntax racket/base)
          pict
@@ -46,7 +46,7 @@
 
 ;@------------------------------------------------------------------------------
 
-(define-enum-type object
+(define-enum-type sokoban-object
   (player crate wall storage-location player-in-storage crate-in-storage))
 
 (define-tuple-type space (x y))
