@@ -243,13 +243,13 @@
 
 (define (sokoban-row-count state)
   (define spaces (in-immutable-hash-keys state))
-  (define max-row (transduce spaces (mapping space-x) #:into (into-max)))
+  (define max-row (transduce spaces (mapping space-y) #:into (into-max)))
   (option-case max-row #:present add1 #:absent (λ () 0)))
 
 (define (sokoban-column-count state)
   (define spaces (in-immutable-hash-keys state))
   (define max-column
-    (transduce spaces (mapping space-y) #:into (into-max)))
+    (transduce spaces (mapping space-x) #:into (into-max)))
   (option-case max-column #:present add1 #:absent (λ () 0)))
 
 (define (sokoban-possible-actions state)
@@ -301,8 +301,8 @@
   (define width (* column-count tile-width))
   (define height (* row-count tile-width))
   (for*/fold ([bkg (blank width height)])
-             ([x (in-range row-count)]
-              [y (in-range column-count)])
+             ([x (in-range column-count)]
+              [y (in-range row-count)])
     (define s (space x y))
     (define next-pict
       (if (hash-has-key? state s)
