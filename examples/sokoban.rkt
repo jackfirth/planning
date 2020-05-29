@@ -11,7 +11,7 @@
   [crate-in-storage sokoban-object?]
   [wall sokoban-object?]
   [storage-location sokoban-object?]
-  ;; TODO(feature request pending): Use (hash-goal/c space? object?) instead.
+  ;; TODO(https://github.com/jackfirth/planning/issues/2): Use hash-goal/c here.
   [sokoban-goal hash-goal?]
   [space? predicate/c]
   [space (-> natural? natural? space?)]
@@ -264,7 +264,7 @@
     (sokoban-action type s dir)))
 
 (define sokoban-goal
-  (hash-goal #:obstructing-values (set storage-location player-in-storage)))
+  (hash-goal #:obstructing-values (set crate)))
 
 (define tile-width 32)
 (define board-rows 4)

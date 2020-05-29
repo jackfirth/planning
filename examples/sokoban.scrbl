@@ -6,6 +6,7 @@
                      planning/hash/problem
                      racket/base
                      racket/contract/base
+                     racket/set
                      racket/math)
           (submod planning/private doc)
           scribble/example)
@@ -92,3 +93,11 @@ only if the crate isn't blocked by a wall or another crate.
  the player or crate is standing on top of a storage location space. Distinct
  objects for these cases are necessary because the Sokoban world uses the
  @tech{hash state representation}, so a single cannot contain multiple objects.}
+
+@; TODO(https://github.com/jackfirth/planning/issues/2): Use hash-goal/c here.
+@defthing[sokoban-goal hash-goal?
+          #:value (hash-goal #:obstructing-values (set crate))]{
+ The @tech{goal} of every Sokoban level is the same: push every crate into
+ storage. Because pushing a @racket[crate] into a storage location changes it
+ into a @racket[crate-in-storage], this means that all that's required to win is
+ for the Sokoban level's hash table to not contain any @racket[crate] values.}
