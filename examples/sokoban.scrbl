@@ -92,7 +92,8 @@ only if the crate isn't blocked by a wall or another crate.
  @racket[player] and @racket[crate] objects, except they represent cases where
  the player or crate is standing on top of a storage location space. Distinct
  objects for these cases are necessary because the Sokoban world uses the
- @tech{hash state representation}, so a single cannot contain multiple objects.}
+ @tech{hash state representation}, so a single space cannot contain multiple
+ objects.}
 
 @; TODO(https://github.com/jackfirth/planning/issues/2): Use hash-goal/c here.
 @defthing[sokoban-goal hash-goal?
