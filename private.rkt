@@ -6,11 +6,14 @@
  define-external-pict
  (contract-out
   [default (-> any/c any/c any/c)]
-  [sequence->set (-> (sequence/c any/c) set?)]
+  [set-coercible-sequence/c contract?]
+  [sequence->set (-> set-coercible-sequence/c set?)]
   [set-contains? (-> set? any/c boolean?)]
-  [set-contains-all? (-> set? set? boolean?)]
-  [set-contains-any? (-> set? set? boolean?)]
-  [set-contains-none? (-> set? set? boolean?)]
+  [set-contains-all? (-> set? set-coercible-sequence/c boolean?)]
+  [set-contains-any? (-> set? set-coercible-sequence/c boolean?)]
+  [set-contains-none? (-> set? set-coercible-sequence/c boolean?)]
+  [set-add-all (-> set? set-coercible-sequence/c set?)]
+  [set-remove-all (-> set? set-coercible-sequence/c set?)]
   [hash-contains? (-> hash? any/c any/c boolean?)]
   [hash-contains-none? (-> hash? (sequence/c entry?) boolean?)]
   [hash-put (-> immutable-hash? any/c any/c immutable-hash?)]
@@ -57,14 +60,31 @@
 (define (default arg default-value)
   (if (unsupplied-arg? arg) default-value arg))
 
-(define (sequence->set seq) (for/set ([v seq]) v))
+(define set-coercible-sequence/c
+  (or/c set? list? multiset? vector? (sequence/c any/c)))
 
-(define (set-contains? s item) (set-member? s item))
-(define (set-contains-all? s items) (subset? items s))
-(define (set-contains-any? s items) (not (set-contains-none? s items)))
+(define (sequence->set seq) (if (set? seq) seq (for/set ([v seq]) v)))
 
-(define (set-contains-none? s items)
-  (equal? (set-count (set-subtract s items)) (set-count s)))
+(define (set-contains? s element) (set-member? s element))
+(define (set-contains-all? s elements) (subset? (sequence->set elements) s))
+(define (set-contains-any? s elements) (not (set-contains-none? s elements)))
+
+(define (set-contains-none? s elements)
+  (equal? (set-count (set-remove-all s elements)) (set-count s)))
+
+(define (set-add-all s elements) (set-union s (sequence->set elements)))
+(define (set-remove-all s elements) (set-subtract s (sequence->set elements)))
+
+(module+ test
+  (test-case "set-add-all"
+    (check-equal? (set-add-all (set 1 2) (set 3 4 5)) (set 1 2 3 4 5))
+    (check-equal? (set-add-all (set 1 2) (list 3 4 5)) (set 1 2 3 4 5))
+    (check-equal? (set-add-all (set 1 2) (list 3 4 4 5)) (set 1 2 3 4 5)))
+
+  (test-case "set-remove-all"
+    (check-equal? (set-remove-all (set 1 2 3 4) (set 1 3)) (set 2 4))
+    (check-equal? (set-remove-all (set 1 2 3 4) (list 1 3)) (set 2 4))
+    (check-equal? (set-remove-all (set 1 2 3 4) (list 1 3 3)) (set 2 4))))
 
 (define (hash-contains? h k v)
   (and (hash-has-key? h k) (equal? (hash-ref h k) v)))
