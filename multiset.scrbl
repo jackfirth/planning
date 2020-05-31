@@ -3,6 +3,7 @@
 @(require (for-label planning/multiset/action
                      planning/multiset/condition
                      planning/multiset/problem
+                     planning/set/condition
                      racket/base
                      racket/contract/base
                      racket/math
@@ -109,6 +110,26 @@ preconditions of the same form as the preconditions in a @tech{multiset action}.
 @defproc[(multiset-condition [preconditions (hash/c any/c range?)])
          multiset-condition?]{
  Constructs a @tech{multiset condition}.}
+
+@defproc[(multiset-condition-ignore-frequencies [condition multiset-condition?])
+         set-condition?]{
+ Weakens @racket[condition] into a @tech{set condition} that only considers
+ whether elements are either present or absent. If a multiset meets
+ @racket[condition], then it will meet the returned set condition. If a multiset
+ fails to meet the returned set condition, then it will fail to meet
+ @racket[condition]. Note that because the returned set condition is weaker than
+ @racket[condition], it's possible for a multiset to fail to meet
+ @racket[condition] but succeed in meeting the returned set condition.
+
+ @(examples
+   #:eval (make-evaluator) #:once
+   (eval:no-prompt
+    (define can-make-water-for-first-time
+      (multiset-condition
+       (hash 'hydrogen (at-least-range 2)
+             'oxygren (at-least-range 1)
+             'water (singleton-range 0)))))
+   (multiset-condition-ignore-frequencies can-make-water-for-first-time))}
 
 @section{Multiset Planning Problems}
 @defmodule[planning/multiset/problem]
