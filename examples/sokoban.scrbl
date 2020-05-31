@@ -1,6 +1,7 @@
 #lang scribble/manual
 
-@(require (for-label planning/examples/sokoban
+@(require (for-label pict
+                     planning/examples/sokoban
                      planning/hash/action
                      planning/hash/goal
                      planning/hash/problem
@@ -17,7 +18,8 @@
                    'planning/hash/action
                    'planning/hash/goal
                    'planning/hash/problem
-                   '(submod planning/hash/visualize headless))
+                   '(submod planning/hash/visualize headless)
+                   'racket/set)
     #:private (list 'racket/base)))
 
 @title{Sokoban}
@@ -95,6 +97,44 @@ only if the crate isn't blocked by a wall or another crate.
  @tech{hash state representation}, so a single space cannot contain multiple
  objects.}
 
+@defproc[(sokoban-possible-actions
+          [initial-state (hash/c space? sokoban-object?)])
+         (set/c hash-action?)]{
+ Constructs a set of all possible actions that could be performed in a Sokoban
+ game starting from @racket[initial-state]. This includes actions that are not
+ immediately applicable, but which can be applied if other possible actions are
+ performed first.
+
+ The set of possible actions returned is an @emph{optimistic estimate}. Every
+ possible action is returned, but some impossible actions may also be returned.
+ An estimate is returned because computing the exact set of possible actions can
+ be complex and prohibitively expensive.
+
+ @(examples
+   #:eval (make-evaluator) #:once
+   (eval:no-prompt
+    (define state
+      (hash (space 0 0) wall
+            (space 0 1) wall
+            (space 0 2) wall
+            (space 0 3) wall
+            (space 1 3) wall
+            (space 2 3) wall
+            (space 3 3) wall
+            (space 4 3) wall
+            (space 4 2) wall
+            (space 4 1) wall
+            (space 4 0) wall
+            (space 3 0) wall
+            (space 2 0) wall
+            (space 1 0) wall
+            (space 1 1) player
+            (space 2 2) crate
+            (space 3 2) storage-location)))
+   
+   (sokoban-pict state)
+   (set-count (sokoban-possible-actions state)))}
+
 @; TODO(https://github.com/jackfirth/planning/issues/2): Use hash-goal/c here.
 @defthing[sokoban-goal hash-goal?
           #:value (hash-goal #:obstructing-values (set crate))]{
@@ -102,3 +142,15 @@ only if the crate isn't blocked by a wall or another crate.
  storage. Because pushing a @racket[crate] into a storage location changes it
  into a @racket[crate-in-storage], this means that all that's required to win is
  for the Sokoban level's hash table to not contain any @racket[crate] values.}
+
+@defproc[(sokoban-pict [state (hash/c space? sokoban-object?)]) pict?]{
+ Draws a picture of @racket[state].
+
+ @(examples
+   #:eval (make-evaluator) #:once
+   (sokoban-pict
+    (hash (space 0 0) player
+          (space 1 3) crate
+          (space 3 1) crate
+          (space 0 4) storage-location
+          (space 4 3) storage-location)))}
