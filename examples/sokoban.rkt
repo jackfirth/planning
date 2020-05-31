@@ -263,15 +263,14 @@
              [type (in-immutable-set action-types)])
     (sokoban-action type s dir)))
 
-(define sokoban-goal
-  (hash-goal #:obstructing-values (set crate)))
-
-(define tile-width 32)
+(define sokoban-goal (hash-goal #:obstructing-values (set crate)))
 
 (define-external-pict floor-pict '(lib "planning/examples/sokoban-floor.png"))
 (define-external-pict player-pict '(lib "planning/examples/sokoban-player.png"))
 (define-external-pict crate-pict '(lib "planning/examples/sokoban-crate.png"))
 (define-external-pict wall-pict '(lib "planning/examples/sokoban-wall.png"))
+
+(define tile-width (pict-width floor-pict))
 
 (define-external-pict storage-location-pict
   '(lib "planning/examples/sokoban-storage-location.png"))
