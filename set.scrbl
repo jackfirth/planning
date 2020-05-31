@@ -32,6 +32,66 @@ A @deftech{set action} is an @tech{action} in the
 @defproc[(set-action? [v any/c]) boolean?]{
  A predicate for @tech{set actions}.}
 
+@defproc[(set-action
+          [#:requirements requirements (sequence/c any/c) empty-set]
+          [#:obstructions obstructions (sequence/c any/c) empty-set]
+          [#:additions additions (sequence/c any/c) empty-set]
+          [#:deletions deletions (sequence/c any/c) empty-set]
+          [#:cost cost (>=/c 0) 1])
+         set-action?]{
+ Constructs a @tech{set action}.}
+
+@defproc[(set-act [s set?] [action set-action?]) set?]{
+ Performs @racket[action] on @racket[s]. If @racket[action] is not
+ @tech{applicable} in @racket[s], a contract error is raised.
+
+ @(examples
+   #:eval (make-evaluator) #:once
+   (set-act (set 1 2 3)
+            (set-action #:additions (set 10) #:deletions (set 2 3)))
+   (eval:error
+    (set-act (set 1 2 3)
+             (set-action #:requirements (set 5) #:additions (set 10)))))}
+
+@defproc[(set-action-applicable? [action set-action?] [s set?]) boolean?]{
+ Determines whether or not @racket[action] is @tech{applicable} in @racket[s]:
+ that is, whether or not @racket[s] meets the action's preconditions.}
+
+@defproc[(set-action-requirements [action set-action?]) set?]{
+ Returns the requirements of @racket[action].}
+
+@defproc[(set-action-obstructions [action set-action?]) set?]{
+ Returns the obstructions of @racket[action].}
+
+@defproc[(set-action-additions [action set-action?]) set?]{
+ Returns the additions of @racket[action].}
+
+@defproc[(set-action-deletions [action set-action?]) set?]{
+ Returns the deletions of @racket[action].}
+
+@defproc[(set-action-cost [action set-action?]) (>=/c 0)]{
+ Returns the cost of @racket[action].}
+
+@defproc[(set-action-preconditions [action set-action?]) set-condition?]{
+ Returns a @tech{set condition} describing the @tech{preconditions} of
+ @racket[action].}
+
+@defproc[(set-action-postconditions [action set-action?]) set-condition?]{
+ Returns a @tech{set condition} describing the @tech{postconditions} of
+ @racket[action].
+
+ @(examples
+   #:eval (make-evaluator) #:once
+   (eval:no-prompt
+    (define action
+      (set-action
+       #:requirements (set 1 3 5)
+       #:additions (set 2 4)
+       #:deletions (set 5))))
+   
+   (set-action-preconditions action)
+   (set-action-postconditions action))}
+
 @section{Set Conditions}
 @defmodule[planning/set/condition]
 
