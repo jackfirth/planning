@@ -39,25 +39,11 @@ only if the crate isn't blocked by a wall or another crate.
   #:eval (make-evaluator) #:once
   (eval:no-prompt
    (define state
-     (hash (space 0 0) wall
-           (space 0 1) wall
-           (space 0 2) wall
-           (space 0 3) wall
-           (space 0 4) wall
-           (space 1 4) wall
-           (space 2 4) wall
-           (space 3 4) wall
-           (space 4 4) wall
-           (space 4 3) wall
-           (space 4 2) wall
-           (space 4 1) wall
-           (space 4 0) wall
-           (space 3 0) wall
-           (space 2 0) wall
-           (space 1 0) wall
-           (space 1 1) player
-           (space 2 2) crate
-           (space 3 3) storage-location))
+     (sokoban-level (space 1 1) player
+                    (space 2 2) crate
+                    (space 3 3) storage-location
+                    #:width 5
+                    #:height 5))
    (define problem
      (hash-planning-problem
       #:state state
@@ -97,6 +83,28 @@ only if the crate isn't blocked by a wall or another crate.
  @tech{hash state representation}, so a single space cannot contain multiple
  objects.}
 
+@defproc[(sokoban-level [s space?] [object sokoban-object?] ... ...
+                        [#:width width exact-positive-integer?]
+                        [#:height height exact-positive-integer?])
+         (hash/c space? sokoban-object?)]{
+ Constructs a hash table representing a Sokoban level with dimensions of
+ @racket[width] and @racket[height]. In addition to each of the space-object
+ pairs specified by the @racket[s] and @racket[object] arguments, walls are
+ placed on the edges of the level.
+
+ @(examples
+   #:eval (make-evaluator) #:once
+   (sokoban-pict
+    (sokoban-level (space 1 1) player
+                   (space 1 3) wall
+                   (space 2 3) wall
+                   (space 2 2) crate
+                   (space 3 5) storage-location
+                   (space 2 4) crate
+                   (space 1 4) storage-location
+                   #:width 5
+                   #:height 7)))}
+
 @defproc[(sokoban-applicable-actions [state (hash/c space? sokoban-object?)])
          (set/c hash-action?)]{
  Constructs a set of all actions that are @tech{applicable} in @racket[state].
@@ -105,23 +113,11 @@ only if the crate isn't blocked by a wall or another crate.
    #:eval (make-evaluator) #:once
    (eval:no-prompt
     (define state
-      (hash (space 0 0) wall
-            (space 0 1) wall
-            (space 0 2) wall
-            (space 0 3) wall
-            (space 1 3) wall
-            (space 2 3) wall
-            (space 3 3) wall
-            (space 4 3) wall
-            (space 4 2) wall
-            (space 4 1) wall
-            (space 4 0) wall
-            (space 3 0) wall
-            (space 2 0) wall
-            (space 1 0) wall
-            (space 1 1) player
-            (space 2 2) crate
-            (space 3 2) storage-location)))
+      (sokoban-level (space 1 1) player
+                     (space 2 2) crate
+                     (space 3 2) storage-location
+                     #:width 5
+                     #:height 4)))
 
    (sokoban-pict state)
    (set-count (sokoban-applicable-actions state)))}
@@ -144,23 +140,11 @@ only if the crate isn't blocked by a wall or another crate.
    #:eval (make-evaluator) #:once
    (eval:no-prompt
     (define state
-      (hash (space 0 0) wall
-            (space 0 1) wall
-            (space 0 2) wall
-            (space 0 3) wall
-            (space 1 3) wall
-            (space 2 3) wall
-            (space 3 3) wall
-            (space 4 3) wall
-            (space 4 2) wall
-            (space 4 1) wall
-            (space 4 0) wall
-            (space 3 0) wall
-            (space 2 0) wall
-            (space 1 0) wall
-            (space 1 1) player
-            (space 2 2) crate
-            (space 3 2) storage-location)))
+      (sokoban-level (space 1 1) player
+                     (space 2 2) crate
+                     (space 3 2) storage-location
+                     #:width 5
+                     #:height 4)))
    
    (sokoban-pict state)
    (set-count (sokoban-possible-actions state)))}
@@ -179,8 +163,10 @@ only if the crate isn't blocked by a wall or another crate.
  @(examples
    #:eval (make-evaluator) #:once
    (sokoban-pict
-    (hash (space 0 0) player
-          (space 1 3) crate
-          (space 3 1) crate
-          (space 0 4) storage-location
-          (space 4 3) storage-location)))}
+    (sokoban-level (space 1 1) player
+                   (space 2 4) crate
+                   (space 4 2) crate
+                   (space 1 5) storage-location
+                   (space 5 4) storage-location
+                   #:width 7
+                   #:height 7)))}

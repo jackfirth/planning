@@ -17,6 +17,10 @@
   [space (-> natural? natural? space?)]
   [space-x (-> space? natural?)]
   [space-y (-> space? natural?)]
+  [sokoban-level
+   (->* (#:width exact-positive-integer? #:height exact-positive-integer?)
+        #:rest sokoban-level-object-arguments/c
+        (hash/c space? sokoban-object? #:immutable #t))]
   [sokoban-applicable-actions
    (-> (hash/c space? sokoban-object? #:immutable #t) (set/c hash-action?))]
   [sokoban-possible-actions
@@ -31,10 +35,12 @@
          planning/private
          racket/match
          racket/math
+         racket/sequence
          racket/set
          rebellion/base/option
          rebellion/collection/entry
          rebellion/collection/hash
+         rebellion/collection/list
          rebellion/collection/multidict
          rebellion/streaming/reducer
          rebellion/streaming/transducer
@@ -68,6 +74,13 @@
 (define (space-to-right s)
   (match-define (space x y) s)
   (space (add1 x) y))
+
+(define sokoban-level-object-arguments/c
+  (or/c empty-list?
+        (cons/c space?
+                (cons/c sokoban-object?
+                        (recursive-contract sokoban-level-object-arguments/c
+                                            #:flat)))))
 
 (define-enum-type direction (up down left right))
 
@@ -272,6 +285,19 @@
 
 (define sokoban-goal (hash-goal #:obstructing-values (set crate)))
 
+(define (sokoban-level #:width width #:height height . objects)
+  (define horizontal-walls
+    (for*/list ([x (in-range width)] [y (in-list (list 0 (sub1 height)))])
+      (entry (space x y) wall)))
+  (define vertical-walls
+    (for*/list ([x (in-list (list 0 (sub1 width)))]
+                [y (in-range 1 (sub1 height))])
+      (entry (space x y) wall)))
+  (transduce (sequence-append (in-transduced objects batching-into-entries)
+                              horizontal-walls
+                              vertical-walls)
+             #:into into-hash))
+
 (define-external-pict floor-pict '(lib "planning/examples/sokoban-floor.png"))
 (define-external-pict player-pict '(lib "planning/examples/sokoban-player.png"))
 (define-external-pict crate-pict '(lib "planning/examples/sokoban-crate.png"))
@@ -316,31 +342,13 @@
 
 (module+ main
   (define state
-    (hash (space 0 0) wall
-          (space 0 1) wall
-          (space 0 2) wall
-          (space 0 3) wall
-          (space 0 4) wall
-          (space 0 5) wall
-          (space 1 5) wall
-          (space 2 5) wall
-          (space 3 5) wall
-          (space 4 5) wall
-          (space 5 5) wall
-          (space 5 4) wall
-          (space 5 3) wall
-          (space 5 2) wall
-          (space 5 1) wall
-          (space 5 0) wall
-          (space 4 0) wall
-          (space 3 0) wall
-          (space 2 0) wall
-          (space 1 0) wall
-          (space 1 1) player
-          (space 2 2) crate
-          (space 2 3) wall
-          (space 3 3) wall
-          (space 4 4) storage-location))
+    (sokoban-level (space 1 1) player
+                   (space 2 2) crate
+                   (space 2 3) wall
+                   (space 3 3) wall
+                   (space 4 4) storage-location
+                   #:width 6
+                   #:height 6))
 
   (define actions (sokoban-possible-actions state))
 
