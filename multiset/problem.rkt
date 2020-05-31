@@ -53,7 +53,7 @@
   (let loop ([state (multiset-planning-problem-state problem)]
              [unconsidered-actions actions])
     (cond
-      [(multiset-condition-achieved? goal state) (present empty-list)]
+      [(multiset-meets-condition? state goal) (present empty-list)]
       [(empty-list? unconsidered-actions) absent]
       [else
        (define next-action (list-first unconsidered-actions))

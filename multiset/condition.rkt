@@ -4,12 +4,12 @@
 
 (provide
  (contract-out
+  [multiset-meets-condition? (-> multiset? multiset-condition? boolean?)]
   [multiset-condition? predicate/c]
   [multiset-condition
    (-> (hash/c any/c nonempty-range? #:immutable #t) multiset-condition?)]
   [multiset-condition-requirements
    (-> multiset-condition? (hash/c any/c nonempty-range? #:immutable #t))]
-  [multiset-condition-achieved? (-> multiset-condition? multiset? boolean?)]
   [multiset-condition-ignore-frequencies
    (-> multiset-condition? set-condition?)]))
 
@@ -23,7 +23,7 @@
 
 (define-tuple-type multiset-condition (requirements))
 
-(define (multiset-condition-achieved? goal set)
+(define (multiset-meets-condition? set goal)
   (define requirements (multiset-condition-requirements goal))
   (for/and ([(element frequency-range) (in-immutable-hash requirements)])
     (range-contains? frequency-range (multiset-frequency set element))))
