@@ -267,10 +267,6 @@
   (hash-goal #:obstructing-values (set crate)))
 
 (define tile-width 32)
-(define board-rows 4)
-(define board-columns 4)
-(define board-width (* board-columns tile-width))
-(define board-height (* board-rows tile-width))
 
 (define-external-pict floor-pict '(lib "planning/examples/sokoban-floor.png"))
 (define-external-pict player-pict '(lib "planning/examples/sokoban-player.png"))
