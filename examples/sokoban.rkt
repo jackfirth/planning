@@ -17,6 +17,8 @@
   [space (-> natural? natural? space?)]
   [space-x (-> space? natural?)]
   [space-y (-> space? natural?)]
+  [sokoban-applicable-actions
+   (-> (hash/c space? sokoban-object? #:immutable #t) (set/c hash-action?))]
   [sokoban-possible-actions
    (-> (hash/c space? sokoban-object? #:immutable #t) (set/c hash-action?))]
   [sokoban-pict (-> (hash/c space? sokoban-object? #:immutable #t) pict?)]))
@@ -262,6 +264,11 @@
              [dir (in-immutable-set directions)]
              [type (in-immutable-set action-types)])
     (sokoban-action type s dir)))
+
+(define (sokoban-applicable-actions state)
+  (for/set ([action (in-immutable-set (sokoban-possible-actions state))]
+            #:when (hash-action-applicable? action state))
+    action))
 
 (define sokoban-goal (hash-goal #:obstructing-values (set crate)))
 

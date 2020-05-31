@@ -97,12 +97,42 @@ only if the crate isn't blocked by a wall or another crate.
  @tech{hash state representation}, so a single space cannot contain multiple
  objects.}
 
+@defproc[(sokoban-applicable-actions [state (hash/c space? sokoban-object?)])
+         (set/c hash-action?)]{
+ Constructs a set of all actions that are @tech{applicable} in @racket[state].
+
+ @(examples
+   #:eval (make-evaluator) #:once
+   (eval:no-prompt
+    (define state
+      (hash (space 0 0) wall
+            (space 0 1) wall
+            (space 0 2) wall
+            (space 0 3) wall
+            (space 1 3) wall
+            (space 2 3) wall
+            (space 3 3) wall
+            (space 4 3) wall
+            (space 4 2) wall
+            (space 4 1) wall
+            (space 4 0) wall
+            (space 3 0) wall
+            (space 2 0) wall
+            (space 1 0) wall
+            (space 1 1) player
+            (space 2 2) crate
+            (space 3 2) storage-location)))
+
+   (sokoban-pict state)
+   (set-count (sokoban-applicable-actions state)))}
+
 @defproc[(sokoban-possible-actions
           [initial-state (hash/c space? sokoban-object?)])
          (set/c hash-action?)]{
- Constructs a set of all possible actions that could be performed in a Sokoban
- game starting from @racket[initial-state]. This includes actions that are not
- immediately applicable, but which can be applied if other possible actions are
+ Constructs a set of all possible actions that could be performed over the
+ course of a Sokoban game starting from @racket[initial-state]. This includes
+ actions that are not mmediately applicable, but which can be applied if other
+ actions are
  performed first.
 
  The set of possible actions returned is an @emph{optimistic estimate}. Every
