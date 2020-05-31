@@ -3,7 +3,7 @@
 (module+ test
   (require fancy-app
            planning/multiset/action
-           planning/multiset/goal
+           planning/multiset/condition
            planning/multiset/problem
            racket/set
            rackunit
@@ -44,7 +44,7 @@
       (multiset-planning-problem
        #:state (multiset-of-copies copper 100)
        #:actions (set transmute-copper-into-silver transmute-silver-into-gold)
-       #:goal (multiset-goal (hash gold (singleton-range 1)))))
+       #:goal (multiset-condition (hash gold (singleton-range 1)))))
     (check-equal?
      (multiset-plan problem)
      (present

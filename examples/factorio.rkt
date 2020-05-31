@@ -1,7 +1,7 @@
 #lang racket/base
 
 (require planning/multiset/action
-         planning/multiset/goal
+         planning/multiset/condition
          rebellion/base/range
          rebellion/collection/multiset
          rebellion/type/enum)
@@ -19,5 +19,5 @@
    #:cost 1/2))
 
 (module+ main
-  (multiset-goal-ignore-frequencies
-   (multiset-goal (hash iron-plate (singleton-range 2)))))
+  (multiset-condition-ignore-frequencies
+   (multiset-condition (hash iron-plate (singleton-range 2)))))

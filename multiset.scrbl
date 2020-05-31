@@ -1,7 +1,7 @@
 #lang scribble/manual
 
 @(require (for-label planning/multiset/action
-                     planning/multiset/goal
+                     planning/multiset/condition
                      planning/multiset/problem
                      racket/base
                      racket/contract/base
@@ -17,7 +17,7 @@
 @(define make-evaluator
    (make-module-sharing-evaluator-factory
     #:public (list 'planning/multiset/action
-                   'planning/multiset/goal
+                   'planning/multiset/condition
                    'planning/multiset/problem
                    'racket/set
                    'rebellion/base/option
@@ -29,7 +29,7 @@
 
 In the @tech{multiset state representation}, the world is represented by a
 @rebellion-tech{multiset}. Actions and goals are represented by
-@tech{multiset actions} and @tech{multiset goals}.
+@tech{multiset actions} and @tech{multiset conditions}.
 
 @section{Multiset Actions}
 @defmodule[planning/multiset/action]
@@ -96,26 +96,28 @@ Multiset actions have four components:
    (multiset-action-applicable? red-to-blue (multiset 'red))
    (multiset-action-applicable? red-to-blue (multiset 'green)))}
 
-@section{Multiset Goals}
-@defmodule[planning/multiset/goal]
+@section{Multiset Conditions}
+@defmodule[planning/multiset/condition]
 
-A @deftech{multiset goal} is a @tech{goal} in the
-@tech{multiset state representation}. Multiset goals contain only a hash of
+A @deftech{multiset condition} is a @tech{condition} in the
+@tech{multiset state representation}. Multiset conditions contain only a hash of
 preconditions of the same form as the preconditions in a @tech{multiset action}.
 
-@defproc[(multiset-goal? [v any/c]) boolean?]{
- A predicate for @tech{multiset goals}.}
+@defproc[(multiset-condition? [v any/c]) boolean?]{
+ A predicate for @tech{multiset conditions}.}
 
-@defproc[(multiset-goal [preconditions (hash/c any/c range?)]) multiset-goal?]{
- Constructs a @tech{multiset goal}.}
+@defproc[(multiset-condition [preconditions (hash/c any/c range?)])
+         multiset-condition?]{
+ Constructs a @tech{multiset condition}.}
 
 @section{Multiset Planning Problems}
 @defmodule[planning/multiset/problem]
 
 A @deftech{multiset planning problem} is a combination of a
-@rebellion-tech{multiset}, a set of @tech{multiset actions}, and a
-@tech{multiset goal}. A solution to the problem is a list of actions to perform
-that will transform the multiset into a multiset that satisfies the goal.
+@rebellion-tech{multiset}, a set of @tech{multiset actions}, and a goal
+@tech{multiset condition}. A solution to the problem is a list of actions to
+perform that will transform the multiset into a multiset that satisfies the
+goal condition.
 
 @defproc[(multiset-planning-problem? [v any/c]) boolean?]{
  A predicate for @tech{multiset planning problems}.}
@@ -123,7 +125,7 @@ that will transform the multiset into a multiset that satisfies the goal.
 @defproc[(multiset-planning-problem
           [#:state state multiset?]
           [#:actions actions (set/c multiset-action?)]
-          [#:goal goal multiset-goal?])
+          [#:goal goal multiset-condition?])
          multiset-planning-problem?]{
  Constructs a @tech{multiset planning problem}.}
 
@@ -139,9 +141,9 @@ that will transform the multiset into a multiset that satisfies the goal.
  @racket[problem].}
 
 @defproc[(multiset-planning-problem-goal [problem multiset-planning-problem?])
-         multiset-goal?]{
- Returns the @tech{multiset goal} that a plan for @racket[problem] must
- achieve.}
+         multiset-condition?]{
+ Returns the goal @tech{multiset condition} that a plan for @racket[problem]
+ must achieve.}
 
 @defproc[(multiset-plan [problem multiset-planning-problem?])
          (option/c (listof multiset-action?))]{
@@ -173,7 +175,7 @@ that will transform the multiset into a multiset that satisfies the goal.
       (multiset-planning-problem
        #:state initial-state
        #:actions (set destroy-water create-peroxide)
-       #:goal (multiset-goal (hash 'peroxide (singleton-range 1))))))
+       #:goal (multiset-condition (hash 'peroxide (singleton-range 1))))))
 
    (define the-plan (multiset-plan create-peroxide-from-water))
    (multiset-action-perform-all (present-value the-plan) initial-state))}

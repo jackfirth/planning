@@ -7,7 +7,7 @@
   [multiset-planning-problem
    (-> #:state multiset?
        #:actions (sequence/c multiset-action?)
-       #:goal multiset-goal?
+       #:goal multiset-condition?
        multiset-planning-problem?)]
   [multiset-planning-problem? predicate/c]
   [multiset-planning-problem-state
@@ -15,13 +15,13 @@
   [multiset-planning-problem-actions
    (-> multiset-planning-problem? (set/c multiset-action?))]
   [multiset-planning-problem-goal
-   (-> multiset-planning-problem? multiset-goal?)]
+   (-> multiset-planning-problem? multiset-condition?)]
   [multiset-plan
    (-> multiset-planning-problem? (option/c (listof multiset-action?)))]))
 
 (require fancy-app
          planning/multiset/action
-         planning/multiset/goal
+         planning/multiset/condition
          planning/private
          racket/match
          racket/sequence
@@ -53,7 +53,7 @@
   (let loop ([state (multiset-planning-problem-state problem)]
              [unconsidered-actions actions])
     (cond
-      [(multiset-goal-achieved? goal state) (present empty-list)]
+      [(multiset-condition-achieved? goal state) (present empty-list)]
       [(empty-list? unconsidered-actions) absent]
       [else
        (define next-action (list-first unconsidered-actions))
