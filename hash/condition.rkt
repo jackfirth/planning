@@ -73,7 +73,7 @@
        (hash-contains-none? hash (hash-condition-obstructions goal))))
 
 (module+ test
-  (test-case "hash-goal-achieved?"
+  (test-case "hash-meets-condition?"
     (test-case "requirements"
       (define condition
         (hash-condition #:requirements (multidict 'a 1 'a 2 'b 3)))
