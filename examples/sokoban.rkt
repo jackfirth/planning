@@ -12,7 +12,7 @@
   [wall sokoban-object?]
   [storage-location sokoban-object?]
   ;; TODO(https://github.com/jackfirth/planning/issues/2): Use hash-goal/c here.
-  [sokoban-goal hash-goal?]
+  [sokoban-goal hash-condition?]
   [space? predicate/c]
   [space (-> natural? natural? space?)]
   [space-x (-> space? natural?)]
@@ -30,7 +30,7 @@
 (require (for-syntax racket/base)
          pict
          planning/hash/action
-         planning/hash/goal
+         planning/hash/condition
          planning/hash/problem
          planning/private
          racket/match
@@ -283,7 +283,7 @@
             #:when (hash-action-applicable? action state))
     action))
 
-(define sokoban-goal (hash-goal #:obstructing-values (set crate)))
+(define sokoban-goal (hash-condition #:obstructing-values (set crate)))
 
 (define (sokoban-level #:width width #:height height . objects)
   (define horizontal-walls

@@ -11,7 +11,7 @@
 
 (require pict
          planning/hash/action
-         planning/hash/goal
+         planning/hash/condition
          planning/hash/problem
          planning/private/animation
          rebellion/base/option
@@ -56,7 +56,7 @@
 
   (require pict
            planning/hash/action
-           planning/hash/goal
+           planning/hash/condition
            planning/hash/problem
            (submod planning/private/animation headless)
            rebellion/base/option

@@ -8,17 +8,17 @@
   [hash-planning-problem
    (-> #:state immutable-hash?
        #:actions (set/c hash-action?)
-       #:goal hash-goal?
+       #:goal hash-condition?
        hash-planning-problem?)]
   [hash-planning-problem? predicate/c]
   [hash-planning-problem-state (-> hash-planning-problem? immutable-hash?)]
   [hash-planning-problem-actions
    (-> hash-planning-problem? (set/c hash-action?))]
-  [hash-planning-problem-goal (-> hash-planning-problem? hash-goal?)]))
+  [hash-planning-problem-goal (-> hash-planning-problem? hash-condition?)]))
 
 (require fancy-app
          planning/hash/action
-         planning/hash/goal
+         planning/hash/condition
          planning/private
          racket/match
          racket/set
@@ -83,7 +83,7 @@
          (selection (and node (plan steps state)) remaining-frontier)
          (select-shallowest-node frontier))
        (cond
-         [(hash-goal-achieved? goal state) (present (list-reverse steps))]
+         [(hash-meets-condition? state goal) (present (list-reverse steps))]
          [else
           (define new-expanded (set-add expanded state))
           (define children (plan-children node actions #:expanded expanded))

@@ -27,7 +27,7 @@
   [hash-action-deletions (-> hash-action? set?)]
   [hash-action-applicable? (-> hash-action? immutable-hash? boolean?)]))
 
-(require planning/hash/goal
+(require planning/hash/condition
          planning/private
          racket/set
          rebellion/collection/hash
@@ -67,15 +67,15 @@
    #:deletions deletions))
 
 (define (hash-action-applicable? action state-hash)
-  (define goal
-    (hash-goal
+  (define preconditions
+    (hash-condition
      #:requirements (hash-action-requirements action)
      #:required-keys (hash-action-required-keys action)
      #:required-values (hash-action-required-values action)
      #:obstructions (hash-action-obstructions action)
      #:obstructing-keys (hash-action-obstructing-keys action)
      #:obstructing-values (hash-action-obstructing-values action)))
-  (hash-goal-achieved? goal state-hash))
+  (hash-meets-condition? state-hash preconditions))
 
 (define (hash-act state-hash action)
   (hash-put-all (hash-remove-all state-hash (hash-action-deletions action))

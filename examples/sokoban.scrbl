@@ -3,7 +3,7 @@
 @(require (for-label pict
                      planning/examples/sokoban
                      planning/hash/action
-                     planning/hash/goal
+                     planning/hash/condition
                      planning/hash/problem
                      racket/base
                      racket/contract/base
@@ -16,7 +16,7 @@
    (make-module-sharing-evaluator-factory
     #:public (list 'planning/examples/sokoban
                    'planning/hash/action
-                   'planning/hash/goal
+                   'planning/hash/condition
                    'planning/hash/problem
                    '(submod planning/hash/visualize headless)
                    'racket/set)

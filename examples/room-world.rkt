@@ -1,14 +1,12 @@
 #lang racket/base
 
 (require planning/hash/action
-         planning/hash/goal
+         planning/hash/condition
          planning/hash/problem
-         racket/match
          racket/set
          rebellion/collection/hash
          rebellion/collection/multidict
-         rebellion/type/enum
-         rebellion/type/tuple)
+         rebellion/type/enum)
 
 (module+ test
   (require (submod "..")
@@ -81,7 +79,7 @@
       (hash-planning-problem
        #:state (hash left-room player doorway door)
        #:actions (set move-left move-right close-door open-door)
-       #:goal (hash-goal #:requirements (multidict right-room player))))
+       #:goal (hash-condition #:requirements (multidict right-room player))))
     (define expected-plan (list open-door move-right))
     (define actual (hash-plan problem))
     (check-pred present? actual)
