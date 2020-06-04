@@ -26,4 +26,5 @@ users.
 @include-section[(lib "planning/set.scrbl")]
 @include-section[(lib "planning/multiset.scrbl")]
 @include-section[(lib "planning/hash.scrbl")]
+@include-section[(lib "planning/examples/phase-transition.scrbl")]
 @include-section[(lib "planning/examples/sokoban.scrbl")]

@@ -1,6 +1,7 @@
 #lang scribble/manual
 
-@(require (for-label planning/set/action
+@(require (for-label planning/examples/phase-transition
+                     planning/set/action
                      planning/set/condition
                      racket/base
                      racket/contract/base
@@ -12,7 +13,8 @@
 
 @(define make-evaluator
    (make-module-sharing-evaluator-factory
-    #:public (list 'planning/set/action
+    #:public (list 'planning/examples/phase-transition
+                   'planning/set/action
                    'planning/set/condition
                    'racket/set)
     #:private (list 'racket/base)))
@@ -91,6 +93,17 @@ A @deftech{set action} is an @tech{action} in the
    
    (set-action-preconditions action)
    (set-action-postconditions action))}
+
+@defproc[(set-invariants [s set?] [actions (sequence/c set-action?)])
+         set-condition?]{
+ Determines the invariants of @racket[s] --- that is, the conditions that will
+ always be true no matter what sequence of actions from @racket[actions] are
+ performed.
+
+ @(examples
+   #:eval (make-evaluator) #:once
+   (set-invariants (set liquid) (set melt freeze))
+   (set-invariants (set solid liquid) (set evaporate condense)))}
 
 @section{Set Conditions}
 @defmodule[planning/set/condition]

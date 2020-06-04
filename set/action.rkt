@@ -27,12 +27,14 @@
   [set-action-deletions (-> set-action? set?)]
   [set-action-cost (-> set-action? (>=/c 0))]
   [set-action-preconditions (-> set-action? set-condition?)]
-  [set-action-postconditions (-> set-action? set-condition?)]))
+  [set-action-postconditions (-> set-action? set-condition?)]
+  [set-invariants (-> set? (sequence/c set-action?) set-condition?)]))
 
 (require fancy-app
          planning/private
          planning/set/condition
          point-free
+         racket/sequence
          racket/set
          rebellion/collection/set
          rebellion/type/record)
@@ -136,3 +138,41 @@
       (define expected
         (set-condition #:requirements (set 3 4 5) #:obstructions (set 1 2)))
       (check-equal? (set-action-postconditions action) expected))))
+
+(define (set-invariants set actions)
+  (define action-set (sequence->set actions))
+  (define never-deleted
+    (for/fold ([never-deleted set]) ([action (in-immutable-set action-set)])
+      (set-remove-all never-deleted (set-action-deletions action))))
+  (define precondition-elements
+    (for/fold ([precondition-elements empty-set])
+              ([action (in-immutable-set action-set)])
+      (~> (set-add-all precondition-elements (set-action-requirements action))
+          (set-add-all _ (set-action-obstructions action)))))
+  (define never-added
+    (for/fold ([never-added (set-remove-all precondition-elements set)])
+              ([action (in-immutable-set action-set)])
+      (set-remove-all never-added (set-action-additions action))))
+  (set-condition #:requirements never-deleted #:obstructions never-added))
+
+(module+ test
+  (test-case "set-invariants"
+    (test-case "if no actions remove an element, the set will always contain it"
+      (define s (set 1 2 3 4 5))
+      (define actions
+        (set (set-action #:deletions (set 1 2))
+             (set-action #:deletions (set 2 3))
+             (set-action #:deletions (set 1 3))))
+      (define invariants (set-invariants s actions))
+      (check-equal? (set-condition-requirements invariants) (set 4 5)))
+
+    (test-case
+        "a precondition element will never be in the set if no action adds it"
+      (define s (set 1 2))
+      (define action
+        (set-action
+         #:requirements (set 1 2 3 4)
+         #:additions (set 5 6)
+         #:deletions (set 3 4)))
+      (define invariants (set-invariants s (set action)))
+      (check-equal? (set-condition-obstructions invariants) (set 3 4)))))
