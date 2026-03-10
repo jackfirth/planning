@@ -19,7 +19,6 @@
   [hash-put (-> immutable-hash? any/c any/c immutable-hash?)]
   [hash-put-all (-> immutable-hash? hash? immutable-hash?)]
   [hash-remove-all (-> immutable-hash? (sequence/c any/c) immutable-hash?)]
-  [multiset-remove-all (-> multiset? (sequence/c any/c) multiset?)]
   [multiset-set-all-frequencies
    (-> multiset? (hash/c any/c exact-nonnegative-integer? #:immutable #t)
        multiset?)]))
@@ -113,9 +112,6 @@
   (test-case "hash-remove-all"
     (define h (hash 'a 1 'b 2 'c 3))
     (check-equal? (hash-remove-all h (list 'a 'c)) (hash 'b 2))))
-
-(define (multiset-remove-all set elements)
-  (for/fold ([set set]) ([e elements]) (multiset-remove set e)))
 
 (define (multiset-set-all-frequencies set frequencies)
   (for/fold ([set set]) ([(v freq) (in-immutable-hash frequencies)])
